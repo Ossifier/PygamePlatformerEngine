@@ -1,7 +1,7 @@
 # PygamePlatformerEngine
 A 2D platformer engine written in Python/Pygame.
 
-TO DO:
+## TO DO:
 1. Implement functionality to gather information on the player state (idling, running, jumping, falling, attacking, taking damage, ect.)
 2. Implement a way to control sprites and animations.
 3. Tighten the current player tracking camera so that feels much smoother for the player.
