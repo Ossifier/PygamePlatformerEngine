@@ -2,7 +2,6 @@ import pygame
 from tiles import Tile
 from settings import tile_size, screen_width, screen_height
 from player import Player
-from camera_test import CameraGroup
 
 
 class Level:
@@ -22,7 +21,6 @@ class Level:
         appropriately named layout list from settings.py."""
         self.tiles = pygame.sprite.Group()
         self.player = pygame.sprite.GroupSingle()
-        self.cameragroup = CameraGroup()
 
         for row_index, row in enumerate(layout):
             for col_index, cell in enumerate(row):
