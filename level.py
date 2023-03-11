@@ -16,6 +16,7 @@ class Level:
         self.world_shift_y = 0
         self.scroll_threshold_leftx = 0.25
         self.scroll_threshold_rightx = 0.5
+        
     def setup_level(self, layout):
         """NOTES: This function loads the level layout. The layout argument can be specified by loading the
         appropriately named layout list from settings.py."""
@@ -74,6 +75,7 @@ class Level:
         else:
             self.world_shift_x = 0
             player.speed = 1
+            
     def scroll_y(self):
         """NOTES: This function scrolls the screen horizonally as the player approaches the edge of a specified
         threshold. This is a comparatively complex function to avoid troublesome collision bugs that can arise due to
@@ -148,6 +150,7 @@ class Level:
             if self.world_shift_y != 0:
                 player.rect.centery += self.world_shift_y
             self.world_shift_y = 0
+            
     def horizontal_movement_collision(self):
         """NOTES: This function controls horizontal collision with objects. If a collision is detected, the player
         rectangle is snapped to the proper side of the object."""
