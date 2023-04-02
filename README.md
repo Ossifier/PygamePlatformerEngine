@@ -8,7 +8,8 @@ A 2D platformer engine written in Python/Pygame.
 4. Start thinking about level design and zone transitions.
 
 ## IN PROGRESS:
-1. Create sprites and assets for the game (ongoing).
+1. Refactor the code so the code is more understanding, and so that adding additional future features is easier to manage.
+2. Create sprites and assets for the game (ongoing).
 
 ## DONE:
 1. Add more detailed comments in the code so that its purpose is more clear (this is important for future development of features).
