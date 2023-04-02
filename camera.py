@@ -43,7 +43,7 @@ class CameraGroup:
 
     def scroll_x_follow(self):
         """NOTES: This function scrolls the screen horizonally as the player approaches the edge of a specified
-        threshold. These scrolling thresholds are controlled by the Level attributes self.scroll_threshold_leftx and
+        threshold. These scrolling thresholds are controlled by the CameraGroup attributes self.scroll_threshold_leftx and
         self.scroll_threshold_rightx. They can be adjusted to meet the needs of a particular stage."""
 
         player = self.player.sprite
