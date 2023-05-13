@@ -92,15 +92,12 @@ class Player(pygame.sprite.Sprite):
         else:
             self.sprinting = False
             
+        # Testing Statistics Return ::: Can Be Removed #
         if keys[pygame.K_q]:
             print(f'Q: Player Dir_X: {self.direction.x}')
             print(f'Q: Player Dir_Y: {self.direction.y}')
             print(f'Q: Player Sp: {self.speed}')
             print(f'Q: Player Mtm: {self.momentum}')
-
-            # print(self.rect.topleft)
-            # Print(f'Direction.X: {self.direction.x}')
-            # print(f'Self.Speed: {self.speed}')
             
     def get_player_states(self):
         """NOTES: This function retrieves the player states for both horizontal and vertical movement. This information
@@ -134,15 +131,6 @@ class Player(pygame.sprite.Sprite):
                 pass
             else:
                 self.player_state_y = 'on ground'
-                
-        # For Testing Purposes:
-                
-        # print(f'Player State X: {self.player_state_x}')
-        # print(f'Player State Y: {self.player_state_y}')
-        # print(f'Player On Ground: {self.on_ground}')
-        # print(f'Player Current Jump Power: {self.current_jump_power}')
-        # print(f'Player State X: {self.player_state_x}')
-        # print(f'Player State X: {self.player_state_y}\n')
         
     def apply_gravity(self):
         """NOTES: This function applies gravity to the player. Rate of speed increase is controlled by self.gravity,
@@ -163,35 +151,30 @@ class Player(pygame.sprite.Sprite):
     def stamina_handler(self):
         """NOTES: This function manages the player's stamina during actions like moving and jumping."""
         # If player stands still, and is not in the air, then their stamina recharges.
-        if self.player_state_y == 'on ground':
+        if self.player_state_y == 'on ground' and (self.sprinting is False or self.player_state_x == 'idle'):
             if self.stamina <= self.max_stamina - self.stamina_recharge_rate:
                 self.stamina += self.stamina_recharge_rate
             else:
                 self.stamina = self.max_stamina
-
-        # Player stamina cannot go below zero.
-        if self.stamina <= 0:
+                
+        # Drain stamina if the player is sprinting
+        if self.sprinting is True and self.stamina >= 0:
+            if self.player_state_y == 'on ground' and self.player_state_x != 'idle':
+                self.stamina -= 1
+        elif self.stamina < 0:
             self.stamina = 0
-            self.winded = True
-        else:
-            self.winded = False
-            
-    ############# WORK ON THIS #############
     
     def sprinting_handler(self):
         """NOTES: This function handles the sprinting and running speed mechanics. Causes the player to slow as down
         to their max running speed as long as they aren't holding the sprint button."""
-        print(f'Direction X: {self.direction.x}')
-        print(f'Player Sprinting: {self.sprinting}')
 
+        # Slow Down Player if Sprint Button Isn't Held #
         if self.player_state_x == 'running left':
             if self.sprinting is False and self.direction.x < -self.max_running_speed:
                 self.direction.x += self.momentum * 0.5
         elif self.player_state_x == 'running right':
             if self.sprinting is False and self.direction.x > self.max_running_speed:
                 self.direction.x -= self.momentum * 0.5
-                
-        ############# WORK ON THIS #############
         
     def update(self):
         """NOTES: Updates the player's state attributes and inputs."""
