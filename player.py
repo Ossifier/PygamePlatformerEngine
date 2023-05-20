@@ -36,7 +36,7 @@ class Player(pygame.sprite.Sprite):
         self.player_state_x = 'idle'
         self.player_state_y = 'on ground'
         self.player_facing_direction = 'facing right'
-        self.jumping = FalseUpdate player.py
+        self.jumping = False
         self.on_ground = False
         self.sprinting = False                        # Sprinting applies a multiplier to run speed, costing stamina.
         self.winded = False                           # 'Winded' simulates running out of breath while running/jumping.
