@@ -4,6 +4,7 @@ import pygame
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
+        
         # Player Sprite #
         self.image = pygame.Surface((32, 64))
         self.image.fill('red')
@@ -83,8 +84,6 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_SPACE]:
             if self.on_ground is True and self.current_jump_power >= 6:
                 self.jump()
-                if self.current_jump_power >= 1:
-                    self.current_jump_power -= 1
                 self.on_ground = False
             elif self.on_ground is False and self.jumping is True and self.player_state_y == 'ascending':
                 if self.current_jump_power > 0:
@@ -162,7 +161,7 @@ class Player(pygame.sprite.Sprite):
             self.jumping = True
             self.on_ground = False
             self.direction.y = self.jump_speed
-            self.stamina -= 20
+            # self.stamina -= 20
         elif self.current_jump_power > 0 and self.winded is False:
             self.direction.y = self.jump_speed
 
@@ -185,7 +184,11 @@ class Player(pygame.sprite.Sprite):
             self.stamina = 0
             self.winded = True
             
-        # Handles the 'Winded' player status.
+        # Drain stamina if the player is jumping (off ground only). #
+        if self.jumping is True and self.on_ground is False:
+            self.stamina -= 1
+            
+        # Handles the 'Winded' player status. #
         if self.winded is True and self.stamina <= (self.max_stamina * self.winded_reset_threshold):
             pass
         else:
@@ -202,9 +205,16 @@ class Player(pygame.sprite.Sprite):
             if self.sprinting is False and self.direction.x > self.max_running_speed:
                 self.direction.x -= self.momentum * 0.5
                 
+    def jump_power_handler(self):
+        """NOTES This function handles jump power recharging mechanics. Basically, whenever the player is on the ground,
+        the maximum height the can jump recharges over time up to a limit. """
+        if self.current_jump_power < self.max_jump_power and self.on_ground is True:
+            self.current_jump_power += self.jump_recharge_rate
+
     def update(self):
         """NOTES: Updates the player's state attributes and inputs."""
         self.get_player_states()
         self.get_player_inputs()
         self.stamina_handler()
         self.sprinting_handler()
+        self.jump_power_handler()
