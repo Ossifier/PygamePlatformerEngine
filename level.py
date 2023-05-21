@@ -17,7 +17,7 @@ class Level:
         self.setup_level(level_data)
 
         # Screen Scrolling Attributes
-        self.level_type = ''
+        self.level_camera_type = ''                # Camera selection for when multiple cameras are implemented.
         
     def setup_level(self, layout):
         """NOTES: This function loads the level layout and snaps the screen to the player's location. The layout
@@ -78,34 +78,29 @@ class Level:
                     
     def vertical_movement_collision(self):
         """NOTES: This function handles vertical collision events. Generally, this allows the player to remain on the
-        ground without falling through. It also handles collisions with the ceilings."""
+        ground without falling through. It also handles collisions with the ceiling."""
         player = self.player.sprite
         player.apply_gravity()
 
         for sprite in self.tiles.sprites():
             if sprite.rect.colliderect(player.rect):
                 sprite.image.fill('purple')                     # For testing purposes. Can be commented out.
+                
                 if player.direction.y > 0:
                     # Floor Collision #
                     player.rect.bottom = sprite.rect.top
-                    if self.player_camera.world_shift_y != 0:     # Corrects landing collision bugs while scrolling.
+                    if self.player_camera.world_shift_y != 0:     # Corrects landing collision bugs at scroll borders
                         player.rect.centery -= player.direction.y
                     player.direction.y = 0
                     player.on_ground = True
-                    if player.current_jump_power < player.max_jump_power:        # Recharges player jump power.
-                        player.current_jump_power += player.jump_recharge_rate   # Consider moving this!
                 if player.direction.y < 0:
                     # Ceiling Collision #
                     player.rect.top = sprite.rect.bottom
-                    # if self.camera_test.world_shift_y != 0:        # Corrects collision bugs while actively scrolling.
-                    #     player.rect.centery -= player.direction.y  # Commented out for now, needs testing!
+                    if self.player_camera.world_shift_y != 0:    # Corrects ceiling collision bugs at scroll borders.
+                        self.player_camera.world_shift_y = 0
                     player.direction.y = 0
                     player.player_state_y = 'descending'
-                    if self.player_camera.world_shift_y != 0:
-                        self.player_camera.world_shift_y = 0
-                    if self.player_camera.world_shift_y < 0:
-                        player.rect.centery += self.player_camera.world_shift_y
-
+                    
     def run(self):
         """NOTES: This function runs the level and performs updates. Called in the main.py file. The order of functions
         is very important, and misordering especially collision functions has the potential to break the level and
