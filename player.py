@@ -165,38 +165,6 @@ class Player(pygame.sprite.Sprite):
             self.direction.y = self.jump_speed
         elif self.current_jump_power > 0 and self.winded is False:
             self.direction.y = self.jump_speed
-
-    def stamina_handler(self):
-        """NOTES: This function manages the player's stamina during actions like moving and jumping."""
-        # If player is not in the air, and is not sprinting, then their stamina recharges. #
-        if self.player_state_y == 'on ground' and (self.sprinting is False or self.player_state_x == 'idle'):
-            if self.stamina <= (self.max_stamina - self.stamina_recharge_rate) and self.winded is False:
-                self.stamina += self.stamina_recharge_rate
-            elif self.stamina <= self.max_stamina - self.stamina_recharge_rate and self.winded is True:
-                self.stamina += (self.stamina_recharge_rate * self.winded_stamina_recharge_penalty)
-            else:
-                self.stamina = self.max_stamina
-
-        # Drain stamina if the player is sprinting. #
-        if self.sprinting is True and self.stamina >= 0:
-            if self.player_state_x != 'idle' and abs(self.direction.x) >= self.max_running_speed:
-                self.stamina -= 1
-        elif self.sprinting is False and abs(self.direction.x > self.max_running_speed):
-            print(f'Player Direction X: {self.direction.x}')
-
-        elif self.stamina < 0:
-            self.stamina = 0
-            self.winded = True
-            
-        # Drain stamina if the player is jumping (off ground only and movement stat is non-zero). #
-        if self.jumping is True and self.on_ground is False and self.direction.y != 0:
-            self.stamina -= 2
-            
-        # Handles the 'Winded' player status.
-        if self.winded is True and self.stamina <= (self.max_stamina * self.winded_reset_threshold):
-            pass
-        else:
-            self.winded = False
             
     def stamina_handler(self):
         """NOTES: This function manages the player's stamina during actions like moving and jumping."""
