@@ -4,7 +4,6 @@ import pygame
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
-        
         # Player Sprite #
         self.image = pygame.Surface((32, 64))
         self.image.fill('red')
@@ -46,7 +45,7 @@ class Player(pygame.sprite.Sprite):
         self.winded_reset_threshold = 0.5           # % of stam bar needed to be filled to clear Winded status.
         self.winded_stamina_recharge_penalty = 0.125    # % reduction of stam bar recharge on being Winded.
         self.winded_stamina_jump_penalty = 0.5
-        
+    
     def get_player_inputs(self):
         """NOTES: This defines the general movement behavior for the player, including running, jumping
         momentum, falling, and the like. To be iterated upon later. This will likely get very complex.
@@ -62,7 +61,7 @@ class Player(pygame.sprite.Sprite):
                     self.direction.x += self.momentum
             elif self.direction.x <= 0:
                 self.direction.x += self.momentum * 3
-                
+        
         # Running Left
         elif keys[pygame.K_LEFT]:
             if self.direction.x <= 0:
@@ -72,14 +71,17 @@ class Player(pygame.sprite.Sprite):
                     self.direction.x -= self.momentum
             elif self.direction.x >= 0:
                 self.direction.x -= self.momentum * 3
+               
+        # No Right/Left Key Pressed.    
         else:
             if self.direction.x > 0.2:
                 self.direction.x -= self.momentum
             elif self.direction.x <= 0.2:
                 self.direction.x += self.momentum
+
             if -0.5 < self.direction.x < 0.5:
                 self.direction.x = 0
-                
+        
         # Jumping
         if keys[pygame.K_SPACE]:
             if self.on_ground is True and self.current_jump_power >= 6:
@@ -93,7 +95,7 @@ class Player(pygame.sprite.Sprite):
                 self.jumping = False
         else:
             self.jumping = False
-            
+        
         # Sprinting
         if keys[pygame.K_d] and self.winded is False:
             self.sprinting = True
@@ -103,7 +105,7 @@ class Player(pygame.sprite.Sprite):
                 self.direction.x -= self.momentum
         else:
             self.sprinting = False
-            
+        
         # Testing Return (Press Q to Print Movement Stats) #
         if keys[pygame.K_q]:
             print(f'Q: Player Dir_X: {self.direction.x}')
@@ -129,21 +131,21 @@ class Player(pygame.sprite.Sprite):
             self.player_facing_direction = 'left'
         elif self.direction.x < 0 and keys[pygame.K_RIGHT] is True:
             self.player_state_x = 'running left turning right'
-            
+        
         # Vertical Player States
         if self.direction.y > 1:
             self.player_state_y = 'descending'
             self.on_ground = False
         elif self.direction.y < 0:
             self.player_state_y = 'ascending'
-            
+        
         # Grounded Player States
         if self.direction.y == 0:
             if self.on_ground is False:
                 pass
             else:
                 self.player_state_y = 'on ground'
-                
+    
     def apply_gravity(self):
         """NOTES: This function applies gravity to the player. Rate of speed increase is controlled by self.gravity,
         while max falling speed is controlled by self.max_falling_speed. These are adjustable."""
@@ -161,7 +163,6 @@ class Player(pygame.sprite.Sprite):
             self.jumping = True
             self.on_ground = False
             self.direction.y = self.jump_speed
-            # self.stamina -= 20
         elif self.current_jump_power > 0 and self.winded is False:
             self.direction.y = self.jump_speed
 
@@ -169,7 +170,7 @@ class Player(pygame.sprite.Sprite):
         """NOTES: This function manages the player's stamina during actions like moving and jumping."""
         # If player is not in the air, and is not sprinting, then their stamina recharges. #
         if self.player_state_y == 'on ground' and (self.sprinting is False or self.player_state_x == 'idle'):
-            if self.stamina <= self.max_stamina - self.stamina_recharge_rate and self.winded is False:
+            if self.stamina <= (self.max_stamina - self.stamina_recharge_rate) and self.winded is False:
                 self.stamina += self.stamina_recharge_rate
             elif self.stamina <= self.max_stamina - self.stamina_recharge_rate and self.winded is True:
                 self.stamina += (self.stamina_recharge_rate * self.winded_stamina_recharge_penalty)
@@ -180,23 +181,55 @@ class Player(pygame.sprite.Sprite):
         if self.sprinting is True and self.stamina >= 0:
             if self.player_state_x != 'idle' and abs(self.direction.x) >= self.max_running_speed:
                 self.stamina -= 1
+        elif self.sprinting is False and abs(self.direction.x > self.max_running_speed):
+            print(f'Player Direction X: {self.direction.x}')
+
         elif self.stamina < 0:
             self.stamina = 0
             self.winded = True
             
-        # Drain stamina if the player is jumping (off ground only). #
-        if self.jumping is True and self.on_ground is False:
-            self.stamina -= 1
+        # Drain stamina if the player is jumping (off ground only and movement stat is non-zero). #
+        if self.jumping is True and self.on_ground is False and self.direction.y != 0:
+            self.stamina -= 2
             
-        # Handles the 'Winded' player status. #
+        # Handles the 'Winded' player status.
         if self.winded is True and self.stamina <= (self.max_stamina * self.winded_reset_threshold):
             pass
         else:
             self.winded = False
             
+    def stamina_handler(self):
+        """NOTES: This function manages the player's stamina during actions like moving and jumping."""
+        
+        if (self.sprinting is True) or abs(self.direction.x) > self.max_running_speed:
+            # Sprinting Stamina Draining Mechanics #
+            if self.player_state_x != 'idle' and self.player_state_y != 'descending':
+                if self.stamina > 0:
+                    self.stamina -= 1
+                else:
+                    self.stamina = 0
+                    self.winded = True
+        else:
+            # Sprinting Stamina Recharge Mechanics #
+            if self.player_state_y == 'on ground' and (self.sprinting is False or self.player_state_x == 'idle'):
+                if self.stamina <= (self.max_stamina - self.stamina_recharge_rate) and self.winded is False:
+                    self.stamina += self.stamina_recharge_rate
+                elif self.stamina <= self.max_stamina - self.stamina_recharge_rate and self.winded is True:
+                    self.stamina += (self.stamina_recharge_rate * self.winded_stamina_recharge_penalty)
+                else:
+                    self.stamina = self.max_stamina
+
+        if self.jumping is True and self.on_ground is False and self.direction.y != 0:
+            self.stamina -= 2
+        if self.winded is True and self.stamina >= (self.max_stamina * self.winded_reset_threshold):
+            self.winded = False
+        if self.stamina <= 0:
+            self.stamina = 0
+            
     def sprinting_handler(self):
         """NOTES: This function handles the sprinting and running speed mechanics. Causes the player to slow as down
         to their max running speed as long as they aren't holding the sprint button."""
+        
         # Slow Down Player if Sprint Button Isn't Held #
         if self.player_state_x == 'running left':
             if self.sprinting is False and self.direction.x < -self.max_running_speed:
