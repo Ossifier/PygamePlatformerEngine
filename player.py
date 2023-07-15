@@ -94,3 +94,134 @@ class Player(pygame.sprite.Sprite):
                     self.current_jump_power -= 1
             else:
                 self.jumping = False
+
+        else:
+            self.jumping = False
+
+        # Sprinting
+        if keys[pygame.K_d] and self.winded is False:
+            self.sprinting = True
+            if self.direction.x < self.max_sprinting_speed and keys[pygame.K_RIGHT] is True:
+                self.direction.x += self.momentum
+            if self.direction.x > -self.max_sprinting_speed and keys[pygame.K_LEFT] is True:
+                self.direction.x -= self.momentum
+        else:
+            self.sprinting = False
+
+        # Testing Return (Press Q to Print Movement Stats) #
+        if keys[pygame.K_q]:
+            print(f'Q: Player Dir_X: {self.direction.x}')
+            print(f'Q: Player Dir_Y: {self.direction.y}')
+            print(f'Q: Player Sp: {self.speed}')
+            print(f'Q: Player Mtm: {self.momentum}')
+
+    def get_player_states(self):
+        """NOTES: This function retrieves the player states for both horizontal and vertical movement. This information
+        is used to control player movement and behavior, and will also be used for specifying animations."""
+        keys = pygame.key.get_pressed()
+
+        # Horizontal Player States
+        if self.direction.x == 0 and self.on_ground is True:
+            self.player_state_x = 'idle'
+
+        if self.direction.x > 0 and keys[pygame.K_RIGHT] is True:
+            self.player_state_x = 'running right'
+            self.player_facing_direction = 'right'
+        elif self.direction.x > 0 and keys[pygame.K_LEFT] is True:
+            self.player_state_x = 'running right turning left'
+
+        if self.direction.x < 0 and keys[pygame.K_LEFT] is True:
+            self.player_state_x = 'running left'
+            self.player_facing_direction = 'left'
+        elif self.direction.x < 0 and keys[pygame.K_RIGHT] is True:
+            self.player_state_x = 'running left turning right'
+
+        # Vertical Player States
+        if self.direction.y > 1:
+            self.player_state_y = 'descending'
+            self.on_ground = False
+        elif self.direction.y < 0:
+            self.player_state_y = 'ascending'
+
+        # Grounded Player States
+        if self.direction.y == 0:
+            if self.on_ground is False:
+                pass
+            else:
+                self.player_state_y = 'on ground'
+
+    def apply_gravity(self):
+        """NOTES: This function applies gravity to the player. Rate of speed increase is controlled by self.gravity,
+        while max falling speed is controlled by self.max_falling_speed. These are adjustable."""
+        if self.direction.y >= self.max_falling_speed:
+            self.direction.y = self.max_falling_speed
+        else:
+            self.direction.y += self.gravity
+        self.rect.y += self.direction.y
+
+    def jump(self):
+        """NOTES: This function controls player jumping behavior. Unless this grows in complexity, it may be worth
+        refactoring this in some way."""
+
+        # Jump if Player is on Ground #
+        if self.on_ground is True:
+            self.jumping = True
+            self.on_ground = False
+            self.direction.y = self.jump_speed
+        elif self.current_jump_power > 0 and self.winded is False:
+            self.direction.y = self.jump_speed
+
+    def stamina_handler(self):
+        """NOTES: This function manages the player's stamina during actions like moving and jumping."""
+        if (self.sprinting is True) or abs(self.direction.x) > self.max_running_speed:
+            # Sprinting Stamina Draining Mechanics #
+            if self.player_state_x != 'idle' and self.player_state_y != 'descending':
+                if self.stamina > 0:
+                    self.stamina -= 1
+                else:
+                    self.stamina = 0
+                    self.winded = True
+        else:
+            # Sprinting Stamina Recharge Mechanics #
+            if self.player_state_y == 'on ground' and (self.sprinting is False or self.player_state_x == 'idle'):
+                if self.stamina <= (self.max_stamina - self.stamina_recharge_rate) and self.winded is False:
+                    self.stamina += self.stamina_recharge_rate
+                elif self.stamina <= self.max_stamina - self.stamina_recharge_rate and self.winded is True:
+                    self.stamina += (self.stamina_recharge_rate * self.winded_stamina_recharge_penalty)
+                else:
+                    self.stamina = self.max_stamina
+
+        if self.jumping is True and self.on_ground is False and self.direction.y != 0:
+            self.stamina -= 2
+
+        if self.winded is True and self.stamina >= (self.max_stamina * self.winded_reset_threshold):
+            self.winded = False
+
+        if self.stamina <= 0:
+            self.stamina = 0
+
+    def sprinting_handler(self):
+        """NOTES: This function handles the sprinting and running speed mechanics. Causes the player to slow as down
+        to their max running speed as long as they aren't holding the sprint button."""
+
+        # Slow Down Player if Sprint Button Isn't Held #
+        if self.player_state_x == 'running left':
+            if self.sprinting is False and self.direction.x < -self.max_running_speed:
+                self.direction.x += self.momentum * 0.5
+        elif self.player_state_x == 'running right':
+            if self.sprinting is False and self.direction.x > self.max_running_speed:
+                self.direction.x -= self.momentum * 0.5
+
+    def jump_power_handler(self):
+        """NOTES This function handles jump power recharging mechanics. Basically, whenever the player is on the ground,
+        the maximum height the can jump recharges over time up to a limit. """
+        if self.current_jump_power < self.max_jump_power and self.on_ground is True:
+            self.current_jump_power += self.jump_recharge_rate
+
+    def update(self):
+        """NOTES: Updates the player's state attributes and inputs."""
+        self.get_player_states()
+        self.get_player_inputs()
+        self.stamina_handler()
+        self.sprinting_handler()
+        self.jump_power_handler()
