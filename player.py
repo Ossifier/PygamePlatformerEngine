@@ -6,7 +6,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
         # Player Sprite #
-        self.sprite_sheet = SpriteSheet('TestSprites/full_sheet.png')
+        self.sprite_sheet = SpriteSheet('Sprites/full_sheet.png')
         self.sprite_list_idle = self.sprite_sheet.build_sprite_list('running')   # Animation state can be changed.
         self.image = self.sprite_list_idle[0]                          # For testing currently, index # can be changed.
         self.rect = self.image.get_rect(topleft=pos)
