@@ -2,7 +2,8 @@
 A simple 2D platformer engine written in Python/Pygame. Contains some souls-like elements such as stamina handling for flavor, but this logic may be removed in a future branch.
 
 ## TO DO:
-1. Perform additional testing, especially for new collision bugs and scrolling hiccups since CameraGroups have been heavily rewritten.
+1. Develop the logic for how the game will handle animations for players and other entities.
+2. Perform additional testing, especially for new collision bugs and scrolling hiccups since CameraGroups have been heavily rewritten.
 3. Implement a way to control sprites and animations.
 4. Tighten the current player tracking camera so that feels much smoother for the player.
 5. Start thinking about level design and zone transitions.
@@ -17,4 +18,5 @@ A simple 2D platformer engine written in Python/Pygame. Contains some souls-like
 1. Further address stamina handler so that stamina reductions when jumping (especially when between ceiling and floor) are more sensible.
 2. Add more detailed comments in the code so that its purpose is more clear (this is important for future development of features).
 3. Begin working on the stamina and jumping handler so that they affect player behavior once the values are depleted.
-4. Rewrote the Camera Groups in camera.py so that they are fully instanced objects and drastically cut down on function complexity. 
+4. Rewrote the Camera Groups in camera.py so that they are fully instanced objects and drastically cut down on function complexity.
+5. Add logic for generating SpriteSheet objects and handling sprite asset importing, specifically for the Player.
