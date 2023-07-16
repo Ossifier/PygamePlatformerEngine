@@ -45,8 +45,7 @@ class Level:
         self.player_camera.scroll_y_follow(player_sprite)
 
     def draw_stat_bars(self):
-        """Draws the Player's Stats as bars. For now, this includes the player's jump power and their stamina.
-        None of these stats are function yet, so this is only for testing purposes for now."""
+        """Draws the Player's Stats as bars. For now, this includes the player's jump power and their stamina."""
         player = self.player.sprite
         pygame.draw.rect(self.display_surface, (255, 255, 0), (10, 10, player.stamina, 10))
         pygame.draw.rect(self.display_surface, (0, 255, 0), (10, 25, player.current_jump_power * 3, 10))
