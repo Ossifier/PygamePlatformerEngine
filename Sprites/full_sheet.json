@@ -1,9 +1,5 @@
 {"animation states": {
   "idle": {
-    "data": {
-      "num of frames": 12,
-      "frame rate": [75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75]
-    },
     "framelist": [
       {
         "frame": {
