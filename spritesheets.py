@@ -29,7 +29,7 @@ class SpriteSheet:
 
         This function can be used to build sprite sheets that have simple, repeated, looping animations."""
         sheet = self.data['animation states'][state]['framelist']
-        frames = self.data['animation states'][state]['data']['num of frames']
+        frames = len(self.data['animation states'][state]['framelist'])
         sprite_list = []
 
         for i in range(frames):
