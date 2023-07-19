@@ -12,6 +12,13 @@ class SpriteSheet:
             self.data = json.load(f)
         f.close()
 
+        # Sprite Animation Attributes #
+        self.current_time = 0
+        self.current_frame = 0
+        self.current_state = ''
+        self.num_frames = 0
+        self.animation_speed = 5
+
     def get_sprite(self, x, y, w, h):
         """NOTES: Retrieves an individual sprite from a sprite sheet image based on its position (x, y) and area
         (width, height) in the image file.
