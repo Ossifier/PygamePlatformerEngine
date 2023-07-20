@@ -7,6 +7,7 @@ pygame.init()
 screen = pygame.display.set_mode((screen_width, 900))
 clock = pygame.time.Clock()
 level = Level(level_test_1, screen)
+FPS = 60
 
 # Main Game Loop #
 while True:
@@ -18,4 +19,4 @@ while True:
     level.run()
 
     pygame.display.update()
-    clock.tick(60)
+    clock.tick(FPS)
