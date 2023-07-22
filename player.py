@@ -8,7 +8,8 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
         # Player Sprite #
         self.sprite_sheet = SpriteSheet('Sprites/full_sheet.png')
-        self.sprite_dict = self.sprite_sheet.build_sprite_dict(['idle', 'running'])     # Make state list builder?
+        self.animation_states = self.sprite_sheet.build_animation_state_list()
+        self.sprite_dict = self.sprite_sheet.build_sprite_dict(self.animation_states)     # Make state list builder?
         self.sprite_list_idle = self.sprite_sheet.build_sprite_list('running')   # Animation state can be changed.
         self.image = self.sprite_list_idle[0]                          # For testing currently, index # can be changed.
         self.rect = self.image.get_rect(topleft=pos)
@@ -51,9 +52,6 @@ class Player(pygame.sprite.Sprite):
         self.winded_reset_threshold = 0.5           # % of stam bar needed to be filled to clear Winded status.
         self.winded_stamina_recharge_penalty = 0.125    # % reduction of stam bar recharge on being Winded.
         self.winded_stamina_jump_penalty = 0.5
-
-        # Player Animation Value Test:
-        self.time_test = 0
 
     def get_player_inputs(self):
         """NOTES: This defines the general movement behavior for the player, including running, jumping
@@ -233,10 +231,6 @@ class Player(pygame.sprite.Sprite):
         self.sprinting_handler()
         self.jump_power_handler()
 
-        # Player Time Test:
-        self.time_test += 1
-        print(self.time_test)
-
 
 if __name__ == '__main__':
     pygame.init()
@@ -253,6 +247,9 @@ if __name__ == '__main__':
     while run:
 
         canvas.fill((50, 50, 50))
+
+        # PLAYER.sprite_sheet.build_animation_state_list()    # TEST
+        print(PLAYER.animation_states)
 
         animate.animate_sprite_dict(
             PLAYER.sprite_sheet,
