@@ -8,6 +8,7 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
         # Player Sprite #
         self.sprite_sheet = SpriteSheet('Sprites/full_sheet.png')
+        self.sprite_dict = self.sprite_sheet.build_sprite_dict(['idle', 'running'])     # Make state list builder?
         self.sprite_list_idle = self.sprite_sheet.build_sprite_list('running')   # Animation state can be changed.
         self.image = self.sprite_list_idle[0]                          # For testing currently, index # can be changed.
         self.rect = self.image.get_rect(topleft=pos)
@@ -255,6 +256,7 @@ if __name__ == '__main__':
 
         animate.animate_sprite_dict(
             PLAYER.sprite_sheet,
+            PLAYER.sprite_dict,
             PLAYER.sprite_sheet.current_state,
             PLAYER.player_state_x_list,
             canvas)
