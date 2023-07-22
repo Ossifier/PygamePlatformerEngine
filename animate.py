@@ -2,19 +2,18 @@ import pygame
 from spritesheets import SpriteSheet
 
 
-def animate_sprite_dict(sprite_test, state, state_list, surface):
-    sprite_dict = sprite_test.build_sprite_dict(state_list)
-    sprite_test.num_frames = len(sprite_test.data['animation states'][state]['framelist'])
+def animate_sprite_dict(sprite, sprite_dict, state, state_list, surface):
+    sprite.num_frames = len(sprite.data['animation states'][state]['framelist'])
 
-    if sprite_test.current_time != 0 and sprite_test.current_time % sprite_test.animation_speed == 0:
-        if sprite_test.current_frame >= sprite_test.num_frames - 1:
-            sprite_test.current_frame = -1
-        sprite_test.current_frame += 1
-        sprite_test.current_time = -1
+    if sprite.current_time != 0 and sprite.current_time % sprite.animation_speed == 0:
+        if sprite.current_frame >= sprite.num_frames - 1:
+            sprite.current_frame = -1
+        sprite.current_frame += 1
+        sprite.current_time = -1
 
-    surface.blit(sprite_dict[state][sprite_test.current_frame], (0, 0))
+    surface.blit(sprite_dict[state][sprite.current_frame], (0, 0))
 
-    sprite_test.current_time += 1
+    sprite.current_time += 1
 
 
 if __name__ == "__main__":
@@ -32,14 +31,14 @@ if __name__ == "__main__":
 
     st_list = ['idle', 'running']
 
-    test_sprite_dict = M_SPRITE.build_sprite_dict(st_list)
+    M_DICT = M_SPRITE.build_sprite_dict(st_list)
 
     run = True
     while run:
 
         canvas.fill((50, 50, 50))
 
-        animate_sprite_dict(M_SPRITE, M_SPRITE.current_state, ['idle', 'running'], canvas)
+        animate_sprite_dict(M_SPRITE, M_DICT, M_SPRITE.current_state, ['idle', 'running'], canvas)
 
         ### TEST ANIMATIONS ###
         events = pygame.event.get()
