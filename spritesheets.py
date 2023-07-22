@@ -7,7 +7,7 @@ class SpriteSheet:
         # Sprite Sheet Data #
         self.filename = filename
         self.sprite_sheet = pygame.image.load(filename).convert()
-        self.meta_data = self.filename.replace('png', 'json')
+        self.meta_data = self.filename.replace('.png', '_config.json')
         with open(self.meta_data) as f:
             self.data = json.load(f)
         f.close()
@@ -15,7 +15,7 @@ class SpriteSheet:
         # Sprite Animation Attributes #
         self.current_time = 0
         self.current_frame = 0
-        self.current_state = ''
+        self.current_state = 'idle'
         self.num_frames = 0
         self.animation_speed = 5
 
@@ -27,7 +27,14 @@ class SpriteSheet:
         sprite = pygame.Surface((w, h))
         sprite.set_colorkey((0, 0, 0))
         sprite.blit(self.sprite_sheet, (0, 0), (x, y, w, h))
+
         return sprite
+
+    def build_animation_state_list(self):
+        """NOTES: Builds a list of animation states from the corresponding sprite's JSON config file by iterating
+         through the animation states dictionary and returning the keys."""
+        state_list = list(self.data['animation states'].keys())
+        return state_list
 
     def build_sprite_list(self, state):
         """NOTES: Builds a list of sprites from the sprite sheet. This function uses a JSON file loaded into the
