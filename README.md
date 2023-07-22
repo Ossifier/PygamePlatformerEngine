@@ -3,11 +3,10 @@ A simple 2D platformer engine written in Python/Pygame. Contains some simple sou
 
 ## TO DO:
 
-1. Fix the following bugs for stamina handling:
-          Depeletion :: Jumping/Non-Sprinting... In Air Sprint No Penalty.
-3. Tighten the current player tracking camera so that feels much smoother for the player.
-4. Start thinking about level design and zone transitions.
-5. Consider adding a branch for the project without stamina mechanics in case I decide to scrap it in the future.
+1. Fix the following bugs for stamina handling: Stamina depeltion while Jumping/Non-Sprinting doesn't wind... In air sprint --> No penalty.
+2. Tighten the current player tracking camera so that feels much smoother for the player.
+3. Start thinking about level design and zone transitions.
+4. Consider adding a branch for the project without stamina mechanics in case I decide to scrap it in the future.
 
 ## IN PROGRESS:
 1. Develop the logic for how the game will handle animations for players and other entities.
