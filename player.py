@@ -189,7 +189,7 @@ class Player(pygame.sprite.Sprite):
                     self.stamina -= 1
                 else:
                     self.stamina = 0
-                    self.winded = True
+
         else:
             # Sprinting Stamina Recharge Mechanics #
             if self.player_state_y == 'on ground' and (self.sprinting is False or self.player_state_x == 'idle'):
@@ -208,6 +208,7 @@ class Player(pygame.sprite.Sprite):
 
         if self.stamina <= 0:
             self.stamina = 0
+            self.winded = True
 
     def sprinting_handler(self):
         """NOTES: This function handles the sprinting and running speed mechanics. Causes the player to slow as down
@@ -263,6 +264,10 @@ class Player(pygame.sprite.Sprite):
         self.jump_power_handler()
         self.animate_player()
 
+        # print(self.player_state_x)
+        if self.winded is True:
+            print('WINDED!!')
+
 
 if __name__ == '__main__':
     pygame.init()
@@ -291,7 +296,7 @@ if __name__ == '__main__':
         #       f'PLAYER SPRITE SHEET - Current State: {PLAYER.sprite_sheet.current_state}\n'
         #       f'PLAYER SPRITE SHEET - Current Frame: {PLAYER.sprite_sheet.current_frame}\n'
         #       f'PLAYER SPRITE SHEET - Current Time: {PLAYER.sprite_sheet.current_time}')
-        
+
         canvas.blit(PLAYER.sprite_dict[PLAYER.player_state_x][index_test], (0, 0))
         canvas.blit(PLAYER.image, (0, 64))
         window.blit(canvas, (0, 0))
