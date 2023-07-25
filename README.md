@@ -3,6 +3,7 @@ A simple 2D platformer engine written in Python/Pygame. Contains some simple sou
 
 ## TO DO:
 
+1. Build a utility for constructing _config.json files for sprite sheets.
 1. Fix the following bugs for stamina handling: Stamina depeltion while Jumping/Non-Sprinting doesn't wind... In air sprint --> No penalty.
 2. Tighten the current player tracking camera so that feels much smoother for the player.
 3. Start thinking about level design and zone transitions.
