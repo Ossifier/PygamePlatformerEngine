@@ -9,10 +9,15 @@ class Player(pygame.sprite.Sprite):
         # Player Sprite #
         self.sprite_sheet = SpriteSheet('Sprites/full_sheet.png')
         self.animation_states = self.sprite_sheet.build_animation_state_list()
-        self.sprite_dict = self.sprite_sheet.build_sprite_dict(self.animation_states)     # Make state list builder?
-        self.sprite_list_idle = self.sprite_sheet.build_sprite_list('running')   # Animation state can be changed.
-        self.image = self.sprite_list_idle[0]                          # For testing currently, index # can be changed.
+        self.sprite_dict = self.sprite_sheet.build_sprite_dict(self.animation_states)
+        # self.active_sprite_list = self.sprite_sheet.build_sprite_list('idle')
+
+        # Player Animations
+        # self.frame_index = 0
+        self.image = self.sprite_dict['running'][self.sprite_sheet.current_frame]
         self.rect = self.image.get_rect(topleft=pos)
+
+        # Player Animation Tests
 
         # Player Running Attributes #
         self.direction = pygame.math.Vector2(0, 0)
@@ -39,9 +44,8 @@ class Player(pygame.sprite.Sprite):
 
         # Player States #
         self.player_state_x = 'idle'
-        self.player_state_x_list = ['idle', 'running']
+        self.player_state_x_test = 'idle'             # This is for testing animations, to be deleted.
         self.player_state_y = 'on ground'
-        self.player_state_y_list = []
         self.player_facing_direction = 'facing right'
         self.jumping = False
         self.on_ground = False
@@ -49,7 +53,7 @@ class Player(pygame.sprite.Sprite):
         self.winded = False                           # 'Winded' simulates running out of breath while running/jumping.
 
         # Player Winded Stats:
-        self.winded_reset_threshold = 0.5           # % of stam bar needed to be filled to clear Winded status.
+        self.winded_reset_threshold = 0.5           # % of stam bar that needs to be filled to clear Winded status.
         self.winded_stamina_recharge_penalty = 0.125    # % reduction of stam bar recharge on being Winded.
         self.winded_stamina_jump_penalty = 0.5
 
@@ -223,6 +227,33 @@ class Player(pygame.sprite.Sprite):
         if self.current_jump_power < self.max_jump_power and self.on_ground is True:
             self.current_jump_power += self.jump_recharge_rate
 
+    def animate_player(self):
+        ########################
+        ### FOR TESTING ONLY ###
+        ########################
+
+        # Retrieve current sprite frame #
+        self.sprite_sheet.current_frame = animate.animate_sprite_dict(
+            self.sprite_sheet,
+            self.player_state_x_test)
+
+        # Gather user States (To Be Removed when all animation state sheets are complete and integrated) #
+        # Consider moving this to the animate.py module. Only for testing now.
+        if self.direction.x != 0 or self.direction.y != 0:
+            if self.player_state_x_test != 'running':
+                self.sprite_sheet.current_frame = 0
+            self.player_state_x_test = 'running'
+        else:
+            if self.player_state_x_test != 'idle':
+                self.sprite_sheet.current_frame = 0
+            self.player_state_x_test = 'idle'
+
+        self.image = self.sprite_dict[self.player_state_x_test][self.sprite_sheet.current_frame]
+
+        ########################
+        ### FOR TESTING ONLY ###
+        ########################
+
     def update(self):
         """NOTES: Updates the player's state attributes and inputs."""
         self.get_player_states()
@@ -230,6 +261,7 @@ class Player(pygame.sprite.Sprite):
         self.stamina_handler()
         self.sprinting_handler()
         self.jump_power_handler()
+        self.animate_player()
 
 
 if __name__ == '__main__':
@@ -248,16 +280,20 @@ if __name__ == '__main__':
 
         canvas.fill((50, 50, 50))
 
-        # PLAYER.sprite_sheet.build_animation_state_list()    # TEST
-        print(PLAYER.animation_states)
-
-        animate.animate_sprite_dict(
+        ### TO FIX LATER ###
+        index_test = animate.animate_sprite_dict(
             PLAYER.sprite_sheet,
             PLAYER.sprite_dict,
-            PLAYER.sprite_sheet.current_state,
-            PLAYER.player_state_x_list,
-            canvas)
+            PLAYER.sprite_sheet.current_state)
 
+        # print(f'PLAYER SPRITE SHEET: {PLAYER.sprite_sheet}\n'
+        #       f'PLAYER SPRITE DICT: {PLAYER.sprite_dict}\n'
+        #       f'PLAYER SPRITE SHEET - Current State: {PLAYER.sprite_sheet.current_state}\n'
+        #       f'PLAYER SPRITE SHEET - Current Frame: {PLAYER.sprite_sheet.current_frame}\n'
+        #       f'PLAYER SPRITE SHEET - Current Time: {PLAYER.sprite_sheet.current_time}')
+        
+        canvas.blit(PLAYER.sprite_dict[PLAYER.player_state_x][index_test], (0, 0))
+        canvas.blit(PLAYER.image, (0, 64))
         window.blit(canvas, (0, 0))
         pygame.display.update()
 
@@ -266,12 +302,12 @@ if __name__ == '__main__':
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     # print('K_UP')
-                    PLAYER.sprite_sheet.current_state = 'idle'
+                    PLAYER.player_state_x = 'idle'
                     PLAYER.sprite_sheet.current_frame = 0
                     PLAYER.sprite_sheet.current_time = 0
                 if event.key == pygame.K_DOWN:
                     # print('K_DOWN')
-                    PLAYER.sprite_sheet.current_state = 'running'
+                    PLAYER.player_state_x = 'running'
                     PLAYER.sprite_sheet.current_frame = 0
                     PLAYER.sprite_sheet.current_time = 0
 
