@@ -2,7 +2,7 @@ import pygame
 from spritesheets import SpriteSheet
 
 
-def animate_sprite_dict(sprite, sprite_dict, state, state_list, surface):
+def animate_sprite_dict(sprite, state):
     sprite.num_frames = len(sprite.data['animation states'][state]['framelist'])
 
     if sprite.current_time != 0 and sprite.current_time % sprite.animation_speed == 0:
@@ -11,9 +11,9 @@ def animate_sprite_dict(sprite, sprite_dict, state, state_list, surface):
         sprite.current_frame += 1
         sprite.current_time = -1
 
-    surface.blit(sprite_dict[state][sprite.current_frame], (0, 0))
-
     sprite.current_time += 1
+
+    return sprite.current_frame
 
 
 if __name__ == "__main__":
@@ -37,8 +37,6 @@ if __name__ == "__main__":
     while run:
 
         canvas.fill((50, 50, 50))
-
-        animate_sprite_dict(M_SPRITE, M_DICT, M_SPRITE.current_state, ['idle', 'running'], canvas)
 
         ### TEST ANIMATIONS ###
         events = pygame.event.get()
