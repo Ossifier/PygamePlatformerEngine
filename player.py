@@ -264,10 +264,6 @@ class Player(pygame.sprite.Sprite):
         self.jump_power_handler()
         self.animate_player()
 
-        # print(self.player_state_x)
-        if self.winded is True:
-            print('WINDED!!')
-
 
 if __name__ == '__main__':
     pygame.init()
