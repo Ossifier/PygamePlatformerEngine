@@ -1,16 +1,13 @@
 import json
 
 
-def get_file_name():
-    print('Directory Location: ')
-    config_name = input('Enter the name of your sprite_sheet: ') + '.json'
-    print('File name: ' + config_name)
-    return config_name
-
-
-def create_file(file):
-    with open(file, 'x') as n_file:
+def create_file():
+    config_file_name = input('Enter the name of your sprite_sheet: ') + '_config.json'
+    print(f'File Name: {config_file_name}')
+    with open(config_file_name, 'x') as n_file:
         json.dump({}, n_file)
+
+    return config_file_name
 
 
 def append_new_data(new_data, file_path):
@@ -50,10 +47,10 @@ def build_config():
             for i in range(frame_num_list[index]):
                 json_data["animation states"][state_names[index]]["framelist"].append(
                     {"frame": {"x": w_au * i, "y": h_au * index, "w": w_au, "h": h_au},
-                     "rotated": False,                                              # Currently Unused
-                     "trimmed": False,                                              # Currently Unused
-                     "spriteSourceSize": {"x": 0, "y": 0, "w": 0, "h": 0},          # Currently Unused
-                     "sourceSize": {"w": 0, "h": 0}}                                # Currently Unused
+                     "rotated": False,                                                  # Currently Unused
+                     "trimmed": False,                                                  # Currently Unused
+                     "spriteSourceSize": {"x": 0, "y": 0, "w": 0, "h": 0},              # Currently Unused
+                     "sourceSize": {"w": 0, "h": 0}}                                    # Currently Unused
                 )
 
     else:
@@ -80,13 +77,9 @@ def build_config():
 
 
 if __name__ == '__main__':
+    config_name = create_file()
+    config_data = build_config()
 
-    # test_data = get_user_info()
-    config_file_name = get_file_name()
-    create_file(config_file_name)
-
-    config_test = build_config()
-
-    append_new_data(config_test, config_file_name)
+    append_new_data(config_data, config_name)
 
     print('\nOperations Complete.')
