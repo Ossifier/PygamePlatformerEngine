@@ -31,9 +31,9 @@ class SpriteSheet:
         return sprite
 
     def build_animation_state_list(self):
-        """NOTES: Builds a list of animation states from the corresponding sprite's JSON config file by iterating
-         through the animation states dictionary and returning the keys."""
-        state_list = list(self.data['animation states'].keys())
+        """NOTES: Builds a list of animation states from the corresponding sprite's JSON config file. It iterates
+         through the animation states dictionary and returns the keys."""
+        state_list = list(self.data['animationStates'].keys())
         return state_list
 
     def build_sprite_list(self, state):
@@ -42,8 +42,8 @@ class SpriteSheet:
         The animation state must be supplied to properly retrieve configuration data.
 
         This function can be used to build sprite sheets that have simple, repeated, looping animations."""
-        sheet = self.data['animation states'][state]['framelist']
-        frames = len(self.data['animation states'][state]['framelist'])
+        sheet = self.data['animationStates'][state]['frameList']
+        frames = len(self.data['animationStates'][state]['frameList'])
         sprite_list = []
 
         for i in range(frames):
