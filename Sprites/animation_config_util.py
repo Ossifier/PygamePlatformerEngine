@@ -19,7 +19,7 @@ def append_new_data(new_data, file_path):
 
 
 def build_config():
-    json_data = {"animation states": {}}
+    json_data = {"animationStates": {}}
     frame_num_list = []
 
     state_names = input('Please enter the list of state names separated by spaces: ').split()
@@ -27,7 +27,7 @@ def build_config():
     for index in range(len(state_names)):
         frame_num = int(input(f'# of frames in {state_names[index].upper()}: '))
         frame_num_list.append(frame_num)
-        json_data["animation states"][state_names[index]] = {"framelist": []}
+        json_data["animationStates"][state_names[index]] = {"frameList": []}
 
     print(f'\nSTATE LIST: {state_names}')
     print(f'NUMBER OF FRAMES: {frame_num_list}\n')
@@ -45,7 +45,7 @@ def build_config():
         for index in range(len(state_names)):
 
             for i in range(frame_num_list[index]):
-                json_data["animation states"][state_names[index]]["framelist"].append(
+                json_data["animationStates"][state_names[index]]["frameList"].append(
                     {"frame": {"x": w_au * i, "y": h_au * index, "w": w_au, "h": h_au},
                      "rotated": False,                                                  # Currently Unused
                      "trimmed": False,                                                  # Currently Unused
@@ -65,7 +65,7 @@ def build_config():
                     w_fr, h_fr = input(f'{state_names[index].upper()} frame {i} dimensions: (w, h): ').split()
                     x_fr, y_fr, w_fr, h_fr = int(x_fr), int(y_fr), int(w_fr), int(h_fr)
 
-                    json_data["animation states"][state_names[index]]["framelist"].append(
+                    json_data["animationStates"][state_names[index]]["frameList"].append(
                         {"frame": {"x": x_fr, "y": y_fr, "w": w_fr, "h": h_fr},
                          "rotated": False,                                              # Currently Unused
                          "trimmed": False,                                              # Currently Unused
