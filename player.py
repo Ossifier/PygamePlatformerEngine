@@ -7,7 +7,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
         # Player Sprite #
-        self.sprite_sheet = SpriteSheet('Sprites/full_sheet.png')
+        self.sprite_sheet = SpriteSheet('sprites/full_sheet.png')
         self.animation_states = self.sprite_sheet.build_animation_state_list()
         self.sprite_dict = self.sprite_sheet.build_sprite_dict(self.animation_states)
         # self.active_sprite_list = self.sprite_sheet.build_sprite_list('idle')
@@ -46,7 +46,7 @@ class Player(pygame.sprite.Sprite):
         self.player_state_x = 'idle'
         self.player_state_x_test = 'idle'             # This is for testing animations, to be deleted.
         self.player_state_y = 'on ground'
-        self.player_facing_direction = 'facing right'
+        self.player_facing_direction = 'right'
         self.jumping = False
         self.on_ground = False
         self.sprinting = False                        # Sprinting applies a multiplier to run speed, costing stamina.
@@ -239,7 +239,7 @@ class Player(pygame.sprite.Sprite):
             self.player_state_x_test)
 
         # Gather user States (To Be Removed when all animation state sheets are complete and integrated) #
-        # Consider moving this to the animate.py module. Only for testing now.
+        # Consider moving this to the animate.py module. Only for testing now. #
         if self.direction.x != 0 or self.direction.y != 0:
             if self.player_state_x_test != 'running':
                 self.sprite_sheet.current_frame = 0
@@ -249,7 +249,15 @@ class Player(pygame.sprite.Sprite):
                 self.sprite_sheet.current_frame = 0
             self.player_state_x_test = 'idle'
 
-        self.image = self.sprite_dict[self.player_state_x_test][self.sprite_sheet.current_frame]
+        # Flip sprite according to direction player is facing. #
+        # Consider moving this to the animate.py module. Only for testing now. #
+        if self.player_facing_direction is 'right':
+            self.image = self.sprite_dict[self.player_state_x_test][self.sprite_sheet.current_frame]
+        elif self.player_facing_direction is 'left':
+            img_flip = pygame.transform.flip(
+                self.sprite_dict[self.player_state_x_test][self.sprite_sheet.current_frame],
+                True, False)
+            self.image = img_flip
 
         ########################
         ### FOR TESTING ONLY ###
@@ -284,7 +292,6 @@ if __name__ == '__main__':
         ### TO FIX LATER ###
         index_test = animate.animate_sprite_dict(
             PLAYER.sprite_sheet,
-            PLAYER.sprite_dict,
             PLAYER.sprite_sheet.current_state)
 
         # print(f'PLAYER SPRITE SHEET: {PLAYER.sprite_sheet}\n'
@@ -292,6 +299,7 @@ if __name__ == '__main__':
         #       f'PLAYER SPRITE SHEET - Current State: {PLAYER.sprite_sheet.current_state}\n'
         #       f'PLAYER SPRITE SHEET - Current Frame: {PLAYER.sprite_sheet.current_frame}\n'
         #       f'PLAYER SPRITE SHEET - Current Time: {PLAYER.sprite_sheet.current_time}')
+        ### TO FIX LATER ###
 
         canvas.blit(PLAYER.sprite_dict[PLAYER.player_state_x][index_test], (0, 0))
         canvas.blit(PLAYER.image, (0, 64))
