@@ -2,9 +2,10 @@
 A simple 2D platformer engine written in Python/Pygame. Contains some simple souls-like elements such as stamina handling for flavor, but this logic may be removed in a future branch.
 
 ## TO DO:
-1. Finish player character spritesheet so development can proceed.
-2. Create art for the game.
-3. Begin planning zones, level transitions, and maps.
+1. Implement delta-time frame interpolation to the game. This will be a big project.
+2. Finish player character spritesheet so development can proceed.
+3. Create art for the game.
+4. Begin planning zones, level transitions, and maps.
 
 ## IN PROGRESS:
 1. Complete comments for new code/functions.
