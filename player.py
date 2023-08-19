@@ -1,23 +1,25 @@
 import pygame
 from spritesheets import SpriteSheet
 import animate
+# from main_test import Del_Time
 
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
         # Player Sprite #
-        self.sprite_sheet = SpriteSheet('sprites/full_sheet.png')
+        self.sprite_sheet = SpriteSheet('sprites/full_sheet(test).png')
         self.animation_states = self.sprite_sheet.build_animation_state_list()
         self.sprite_dict = self.sprite_sheet.build_sprite_dict(self.animation_states)
-        # self.active_sprite_list = self.sprite_sheet.build_sprite_list('idle')
 
         # Player Animations
         # self.frame_index = 0
-        self.image = self.sprite_dict['running'][self.sprite_sheet.current_frame]
+        self.image = self.sprite_dict['idle'][self.sprite_sheet.current_frame]
         self.rect = self.image.get_rect(topleft=pos)
 
         # Player Animation Tests
+        self.clock = pygame.time.Clock()
+        self.delta_time = self.clock.tick(60) / 1000
 
         # Player Running Attributes #
         self.direction = pygame.math.Vector2(0, 0)
@@ -48,7 +50,7 @@ class Player(pygame.sprite.Sprite):
         self.player_state_y = 'on ground'
         self.player_facing_direction = 'right'
         self.jumping = False
-        self.on_ground = False
+        self.on_ground = True
         self.sprinting = False                        # Sprinting applies a multiplier to run speed, costing stamina.
         self.winded = False                           # 'Winded' simulates running out of breath while running/jumping.
 
@@ -215,12 +217,10 @@ class Player(pygame.sprite.Sprite):
         to their max running speed as long as they aren't holding the sprint button."""
 
         # Slow Down Player if Sprint Button Isn't Held #
-        if self.player_state_x == 'running left':
-            if self.sprinting is False and self.direction.x < -self.max_running_speed:
-                self.direction.x += self.momentum * 0.5
-        elif self.player_state_x == 'running right':
-            if self.sprinting is False and self.direction.x > self.max_running_speed:
-                self.direction.x -= self.momentum * 0.5
+        if self.player_state_x == 'running left' and (self.sprinting is False and self.direction.x < -self.max_running_speed):
+            self.direction.x += self.momentum * 0.5
+        elif self.player_state_x == 'running right' and (self.sprinting is False and self.direction.x > self.max_running_speed):
+            self.direction.x -= self.momentum * 0.5
 
     def jump_power_handler(self):
         """NOTES This function handles jump power recharging mechanics. Basically, whenever the player is on the ground,
@@ -238,26 +238,46 @@ class Player(pygame.sprite.Sprite):
             self.sprite_sheet,
             self.player_state_x_test)
 
-        # Gather user States (To Be Removed when all animation state sheets are complete and integrated) #
-        # Consider moving this to the animate.py module. Only for testing now. #
-        if self.direction.x != 0 or self.direction.y != 0:
-            if self.player_state_x_test != 'running':
-                self.sprite_sheet.current_frame = 0
-            self.player_state_x_test = 'running'
-        else:
-            if self.player_state_x_test != 'idle':
-                self.sprite_sheet.current_frame = 0
-            self.player_state_x_test = 'idle'
-
-        # Flip sprite according to direction player is facing. #
-        # Consider moving this to the animate.py module. Only for testing now. #
-        if self.player_facing_direction is 'right':
+        # Flip image based on direction and animate. #
+        if self.player_facing_direction == 'right':
             self.image = self.sprite_dict[self.player_state_x_test][self.sprite_sheet.current_frame]
-        elif self.player_facing_direction is 'left':
+        elif self.player_facing_direction == 'left':
             img_flip = pygame.transform.flip(
                 self.sprite_dict[self.player_state_x_test][self.sprite_sheet.current_frame],
                 True, False)
             self.image = img_flip
+
+        # On Ground Animations #
+        if self.on_ground is True:
+            if self.direction.x >= 8 or self.direction.x <= -8:
+                if self.player_state_x_test != 'sprinting':
+                    self.sprite_sheet.current_frame = 0
+                self.player_state_x_test = 'sprinting'
+            elif self.direction.x != 0 or self.direction.y != 0:
+                if self.player_state_x_test != 'running':
+                    self.sprite_sheet.current_frame = 0
+                self.player_state_x_test = 'running'
+            else:
+                if self.player_state_x_test != 'idle':
+                    self.sprite_sheet.current_frame = 0
+                self.player_state_x_test = 'idle'
+
+        # Falling Animations #
+        if self.on_ground is False and self.jumping is False and self.direction.y >= 0:
+            if self.player_state_x_test != 'falling':
+                self.sprite_sheet.current_frame = 0
+            self.player_state_x_test = 'falling'
+
+            if self.sprite_sheet.current_frame == 9 and self.sprite_sheet.current_time == self.sprite_sheet.animation_speed:
+                self.sprite_sheet.current_frame = 6
+                self.sprite_sheet.current_time = 0
+                pass
+
+        # Jumping Animations #
+        elif self.on_ground is False and self.jumping is True or self.direction.y < 0:        # Jump or Dir for springs.
+            if self.player_state_x_test != 'jumping':
+                self.sprite_sheet.current_frame = 0
+            self.player_state_x_test = 'jumping'
 
         ########################
         ### FOR TESTING ONLY ###
@@ -271,6 +291,10 @@ class Player(pygame.sprite.Sprite):
         self.sprinting_handler()
         self.jump_power_handler()
         self.animate_player()
+
+        # print(self.player_state_x)
+        if self.winded is True:
+            print('WINDED!!')
 
 
 if __name__ == '__main__':
@@ -293,13 +317,6 @@ if __name__ == '__main__':
         index_test = animate.animate_sprite_dict(
             PLAYER.sprite_sheet,
             PLAYER.sprite_sheet.current_state)
-
-        # print(f'PLAYER SPRITE SHEET: {PLAYER.sprite_sheet}\n'
-        #       f'PLAYER SPRITE DICT: {PLAYER.sprite_dict}\n'
-        #       f'PLAYER SPRITE SHEET - Current State: {PLAYER.sprite_sheet.current_state}\n'
-        #       f'PLAYER SPRITE SHEET - Current Frame: {PLAYER.sprite_sheet.current_frame}\n'
-        #       f'PLAYER SPRITE SHEET - Current Time: {PLAYER.sprite_sheet.current_time}')
-        ### TO FIX LATER ###
 
         canvas.blit(PLAYER.sprite_dict[PLAYER.player_state_x][index_test], (0, 0))
         canvas.blit(PLAYER.image, (0, 64))
