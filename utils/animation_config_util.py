@@ -2,6 +2,7 @@ import json
 
 
 def create_file():
+    """NOTES: Creates a JSON file using an input name, and returns the file name as a string."""
     config_file_name = input('Enter the name of your sprite_sheet: ') + '_config.json'
     print(f'File Name: {config_file_name}')
     with open(config_file_name, 'x') as n_file:
@@ -11,6 +12,7 @@ def create_file():
 
 
 def append_new_data(new_data, file_path):
+    """Adds dictionary data provided into the function into the specified JSON file path/file name."""
     with open(file_path, 'r+') as file:
         file_data = json.load(file)
         file_data.update(new_data)
@@ -19,6 +21,11 @@ def append_new_data(new_data, file_path):
 
 
 def build_config():
+    """Builds nested dictionaries and dictionary lists for use in automating the deployment of sprite config files.
+    Prompts user to input the list of animation states, and the number of frames in those states.
+
+    Auto-Config: Automatically builds configuration, best used for when the size of individual sprites does not change.
+    Manual-Config: Builds config for each frame based on user input, only use if sprite sizes vary."""
     json_data = {"animationStates": {}}
     frame_num_list = []
 
