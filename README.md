@@ -3,9 +3,10 @@ A simple 2D platformer engine written in Python/Pygame. Contains some simple sou
 
 ## TO DO:
 1. Implement delta-time frame interpolation to the game. This will be a big project.
-2. Finish player character spritesheet so development can proceed.
-3. Create art for the game.
-4. Begin planning zones, level transitions, and maps.
+2. Fix state-switching bug when player is jumping between ceiling/floor (rapid player_state flipping).
+3. Finish player character spritesheet so development can proceed.
+4. Create art for the game.
+5. Begin planning zones, level transitions, and maps.
 
 ## IN PROGRESS:
 1. Complete comments for new code/functions.
