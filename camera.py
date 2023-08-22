@@ -64,7 +64,7 @@ class CameraGroup:
             if self.world_shift_y == 0:                         # Border Offset
                 target.rect.centery += target.direction.y
 
-            self.world_shift_y = -target.direction.y
+            self.world_shift_y = -round(target.direction.y)
             target.rect.centery -= target.direction.y
 
         # Top Screen Scrolling #
@@ -72,7 +72,7 @@ class CameraGroup:
             if self.world_shift_y == 0:                         # Border Offset
                 target.rect.centery += target.direction.y
 
-            self.world_shift_y = -target.direction.y - 1
+            self.world_shift_y = -round(target.direction.y - 1)
             target.rect.centery -= target.direction.y
 
         # Player Within Screen Scrolling Boundaries #
