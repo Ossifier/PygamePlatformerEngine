@@ -2,7 +2,7 @@
 A simple 2D platformer engine written in Python/Pygame. Contains some simple souls-like elements such as stamina handling for flavor, but this logic may be removed in a future branch.
 
 ## TO DO:
-1. Fix level layout ecoupling when jumping while scrolling in the y axis. 
+1. Fix Low-Grav Collision Bug where Vertical Collision = Horizontal Collision when scrolling top. 
 2. Implement delta-time frame interpolation to the game. This will be a big project.
 3. Fix state-switching bug when player is jumping between ceiling/floor (rapid player_state flipping).
 4. Finish player character spritesheet so development can proceed.
@@ -28,4 +28,5 @@ A simple 2D platformer engine written in Python/Pygame. Contains some simple sou
 7. Moved animation dictionaries to entity class attribute and added animation state builders so the same logic can be implemented for building sprite sheets for other entities as they are added.
 8. Build a utility for constructing _config.json files for sprite sheets.
 9. Develop the logic for how the game will handle animations for players and other entities.
-4. Implement functionality to gather information on the player state (idling, running, jumping, falling, attacking, taking damage, ect.
+10. Implement functionality to gather information on the player state (idling, running, jumping, falling, attacking, taking damage, ect.
+11. Fix level layout decoupling/drifting when screen scrolling (due to rounding errors).
