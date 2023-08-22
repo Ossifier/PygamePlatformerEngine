@@ -23,13 +23,11 @@ class Player(pygame.sprite.Sprite):
 
         # Player Running Attributes #
         self.direction = pygame.math.Vector2(0, 0)
-        self.speed = 1
-        self.max_running_speed = 4
-        self.max_sprinting_speed = self.max_running_speed * 2
-        self.speed_profile = self.speed
-        self.gravity = 1
+        self.move_speed = 0.25
+        self.max_move_speed = 4
+        self.max_running_speed = self.max_move_speed * 2
+        self.gravity = 0.1
         self.max_falling_speed = 10
-        self.momentum = 0.25
 
         # Player Jumping Attributes #
         self.max_jump_power = 16
@@ -51,7 +49,7 @@ class Player(pygame.sprite.Sprite):
         self.player_facing_direction = 'right'
         self.jumping = False
         self.on_ground = True
-        self.sprinting = False                        # Sprinting applies a multiplier to run speed, costing stamina.
+        self.running = False                        # Running applies a multiplier to run speed, costing stamina.
         self.winded = False                           # 'Winded' simulates running out of breath while running/jumping.
 
         # Player Winded Stats:
@@ -68,28 +66,28 @@ class Player(pygame.sprite.Sprite):
         # Running Right
         if keys[pygame.K_RIGHT]:
             if self.direction.x >= 0:
-                if self.direction.x >= self.max_running_speed:
+                if self.direction.x >= self.max_move_speed:
                     pass
                 else:
-                    self.direction.x += self.momentum
+                    self.direction.x += self.move_speed
             elif self.direction.x <= 0:
-                self.direction.x += self.momentum * 3
+                self.direction.x += self.move_speed * 3
 
         # Running Left
         elif keys[pygame.K_LEFT]:
             if self.direction.x <= 0:
-                if self.direction.x <= -self.max_running_speed:
+                if self.direction.x <= -self.max_move_speed:
                     pass
                 else:
-                    self.direction.x -= self.momentum
+                    self.direction.x -= self.move_speed
             elif self.direction.x >= 0:
-                self.direction.x -= self.momentum * 3
+                self.direction.x -= self.move_speed * 3
 
         else:
             if self.direction.x > 0.2:
-                self.direction.x -= self.momentum
+                self.direction.x -= self.move_speed
             elif self.direction.x <= 0.2:
-                self.direction.x += self.momentum
+                self.direction.x += self.move_speed
 
             if -0.5 < self.direction.x < 0.5:
                 self.direction.x = 0
@@ -111,20 +109,13 @@ class Player(pygame.sprite.Sprite):
 
         # Sprinting
         if keys[pygame.K_d] and self.winded is False:
-            self.sprinting = True
-            if self.direction.x < self.max_sprinting_speed and keys[pygame.K_RIGHT] is True:
-                self.direction.x += self.momentum
-            if self.direction.x > -self.max_sprinting_speed and keys[pygame.K_LEFT] is True:
-                self.direction.x -= self.momentum
+            self.running = True
+            if self.direction.x < self.max_running_speed and keys[pygame.K_RIGHT] is True:
+                self.direction.x += self.move_speed
+            if self.direction.x > -self.max_running_speed and keys[pygame.K_LEFT] is True:
+                self.direction.x -= self.move_speed
         else:
-            self.sprinting = False
-
-        # Testing Return (Press Q to Print Movement Stats) #
-        if keys[pygame.K_q]:
-            print(f'Q: Player Dir_X: {self.direction.x}')
-            print(f'Q: Player Dir_Y: {self.direction.y}')
-            print(f'Q: Player Sp: {self.speed}')
-            print(f'Q: Player Mtm: {self.momentum}')
+            self.running = False
 
     def get_player_states(self):
         """NOTES: This function retrieves the player states for both horizontal and vertical movement. This information
@@ -184,7 +175,7 @@ class Player(pygame.sprite.Sprite):
 
     def stamina_handler(self):
         """NOTES: This function manages the player's stamina during actions like moving and jumping."""
-        if (self.sprinting is True) or abs(self.direction.x) > self.max_running_speed:
+        if (self.running is True) or abs(self.direction.x) > self.max_move_speed:
             # Sprinting Stamina Draining Mechanics #
             if self.player_state_x != 'idle' and self.player_state_y != 'descending':
                 if self.stamina > 0:
@@ -194,7 +185,7 @@ class Player(pygame.sprite.Sprite):
 
         else:
             # Sprinting Stamina Recharge Mechanics #
-            if self.player_state_y == 'on ground' and (self.sprinting is False or self.player_state_x == 'idle'):
+            if self.player_state_y == 'on ground' and (self.running is False or self.player_state_x == 'idle'):
                 if self.stamina <= (self.max_stamina - self.stamina_recharge_rate) and self.winded is False:
                     self.stamina += self.stamina_recharge_rate
                 elif self.stamina <= self.max_stamina - self.stamina_recharge_rate and self.winded is True:
@@ -217,10 +208,10 @@ class Player(pygame.sprite.Sprite):
         to their max running speed as long as they aren't holding the sprint button."""
 
         # Slow Down Player if Sprint Button Isn't Held #
-        if self.player_state_x == 'running left' and (self.sprinting is False and self.direction.x < -self.max_running_speed):
-            self.direction.x += self.momentum * 0.5
-        elif self.player_state_x == 'running right' and (self.sprinting is False and self.direction.x > self.max_running_speed):
-            self.direction.x -= self.momentum * 0.5
+        if self.player_state_x == 'running left' and (self.running is False and self.direction.x < -self.max_move_speed):
+            self.direction.x += self.move_speed * 0.5
+        elif self.player_state_x == 'running right' and (self.running is False and self.direction.x > self.max_move_speed):
+            self.direction.x -= self.move_speed * 0.5
 
     def jump_power_handler(self):
         """NOTES This function handles jump power recharging mechanics. Basically, whenever the player is on the ground,
@@ -250,13 +241,13 @@ class Player(pygame.sprite.Sprite):
         # On Ground Animations #
         if self.on_ground is True:
             if self.direction.x >= 8 or self.direction.x <= -8:
-                if self.player_state_x_test != 'sprinting':
-                    self.sprite_sheet.current_frame = 0
-                self.player_state_x_test = 'sprinting'
-            elif self.direction.x != 0 or self.direction.y != 0:
                 if self.player_state_x_test != 'running':
                     self.sprite_sheet.current_frame = 0
                 self.player_state_x_test = 'running'
+            elif self.direction.x != 0:
+                if self.player_state_x_test != 'walking':
+                    self.sprite_sheet.current_frame = 0
+                self.player_state_x_test = 'walking'
             else:
                 if self.player_state_x_test != 'idle':
                     self.sprite_sheet.current_frame = 0
@@ -291,54 +282,3 @@ class Player(pygame.sprite.Sprite):
         self.sprinting_handler()
         self.jump_power_handler()
         self.animate_player()
-
-        # print(self.player_state_x)
-        if self.winded is True:
-            print('WINDED!!')
-
-
-if __name__ == '__main__':
-    pygame.init()
-    DISPLAY_W, DISPLAY_H = 1000, 500
-    canvas = pygame.Surface((DISPLAY_W, DISPLAY_H))
-    window = pygame.display.set_mode((DISPLAY_W, DISPLAY_H))
-    pygame.display.set_caption('[player.py]')
-    clock = pygame.time.Clock()
-    FPS = 60
-
-    PLAYER = Player((0, 0))
-
-    run = True
-    while run:
-
-        canvas.fill((50, 50, 50))
-
-        ### TO FIX LATER ###
-        index_test = animate.animate_sprite_dict(
-            PLAYER.sprite_sheet,
-            PLAYER.sprite_sheet.current_state)
-
-        canvas.blit(PLAYER.sprite_dict[PLAYER.player_state_x][index_test], (0, 0))
-        canvas.blit(PLAYER.image, (0, 64))
-        window.blit(canvas, (0, 0))
-        pygame.display.update()
-
-        ### TEST ANIMATIONS ###
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
-                    # print('K_UP')
-                    PLAYER.player_state_x = 'idle'
-                    PLAYER.sprite_sheet.current_frame = 0
-                    PLAYER.sprite_sheet.current_time = 0
-                if event.key == pygame.K_DOWN:
-                    # print('K_DOWN')
-                    PLAYER.player_state_x = 'running'
-                    PLAYER.sprite_sheet.current_frame = 0
-                    PLAYER.sprite_sheet.current_time = 0
-
-            ### QUIT ###
-            if event.type == pygame.QUIT:
-                run = False
-
-        clock.tick(FPS)
