@@ -244,7 +244,7 @@
         }
       ]
     },
-    "running": {
+    "walking": {
       "frameList": [
         {
           "frame": {
@@ -508,7 +508,7 @@
         }
       ]
     },
-    "sprinting": {
+    "running": {
       "frameList": [
         {
           "frame": {
