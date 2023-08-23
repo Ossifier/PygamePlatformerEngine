@@ -10,6 +10,7 @@ class Level:
         # Level Setup
         self.tiles = pygame.sprite.Group()
         self.player = pygame.sprite.GroupSingle()
+        self.fps = 0
 
         # Camera Setup
         self.player_camera = CameraGroup()
@@ -50,6 +51,34 @@ class Level:
         pygame.draw.rect(self.display_surface, (255, 255, 0), (10, 10, player.stamina, 10))
         pygame.draw.rect(self.display_surface, (0, 255, 0), (10, 25, player.current_jump_power * 3, 10))
 
+    def draw_debug_panel(self):
+        player = self.player.sprite
+        font = pygame.font.SysFont('courier', 15)
+
+        WHITE = (255, 255, 255)
+        DK_GREY = (35, 35, 35)
+
+        fps = font.render(f'FPS: {round(self.fps)}', True, WHITE)
+        dir_x = font.render(f'Dir X: {round(player.direction.x, 3)}', True, WHITE)
+        dir_y = font.render(f'Dir Y: {round(player.direction.y, 3)}', True, WHITE)
+        w_shft_x = font.render(f'Wld_Shft X: {round(self.player_camera.world_shift_x, 3)}', True, WHITE)
+        w_shft_y = font.render(f'Wld_Shft Y: {round(self.player_camera.world_shift_y, 3)}', True, WHITE)
+        state_x = font.render(f'State X: {player.player_state_x}', True, WHITE)
+        state_y = font.render(f'State Y: {player.player_state_y}', True, WHITE)
+        on_grnd = font.render(f'On Grnd: {player.on_ground}', True, WHITE)
+        jump = font.render(f'Jump: {player.jumping}', True, WHITE)
+
+        pygame.draw.rect(self.display_surface, DK_GREY, (940, 10, 250, 145))
+        self.display_surface.blit(fps, (950, 15))
+        self.display_surface.blit(dir_x, (950, 30))
+        self.display_surface.blit(dir_y, (950, 45))
+        self.display_surface.blit(w_shft_x, (950, 60))
+        self.display_surface.blit(w_shft_y, (950, 75))
+        self.display_surface.blit(state_x, (950, 90))
+        self.display_surface.blit(state_y, (950, 105))
+        self.display_surface.blit(on_grnd, (950, 120))
+        self.display_surface.blit(jump, (950, 135))
+
     def horizontal_movement_collision(self):
         """NOTES: This function controls horizontal collision with objects. If a collision is detected, the player
         rectangle is snapped to the proper side of the object.
@@ -59,17 +88,36 @@ class Level:
         of the sprite. Doing so this way eliminates a lot of troublesome bugs that arise when collisions are handled by
         checking player state and directionality, and greatly reduces function complexity."""
         player = self.player.sprite
-        player.rect.x += player.direction.x * player.speed
+        player.rect.x += player.direction.x * player.move_speed
 
         for sprite in self.tiles.sprites():
             if sprite.rect.colliderect(player.rect):
+
+                if self.player_camera.world_shift_y != 0:
+                    
+                    print(f'Horizontal Collision Left:\n'
+                          f'Player Direction X/Y: {player.direction}\n'
+                          f'Camera Scroll X/Y: {self.player_camera.world_shift_x, self.player_camera.world_shift_y}\n'
+                          f'L/R Calc Val: {abs(player.rect.left - sprite.rect.right), abs(player.rect.right - sprite.rect.left)}\n'
+                          f'Player State X: {player.player_state_x}\n')
+
                 sprite.image.fill('orange')     # For collision type testing purposes. Can be commented out.
                 if abs(player.rect.left - sprite.rect.right) < abs(player.rect.right - sprite.rect.left):
+                    # print(f'Horizontal Collision Left:\n'
+                    #       f'Player Direction X/Y: {player.direction}\n'
+                    #       f'Camera Scroll X/Y: {self.player_camera.world_shift_x, self.player_camera.world_shift_y}\n'
+                    #       f'L/R Calc Val: {abs(player.rect.left - sprite.rect.right), abs(player.rect.right - sprite.rect.left)}\n'
+                    #       f'Player State X: {player.player_state_x}')
                     # Left Collision #
                     player.rect.left = sprite.rect.right
                     player.direction.x = 0
                     player.player_state_x = 'colliding left'
                 else:
+                    # print(f'Horizontal Collision Right:\n'
+                    #       f'Player Direction X/Y: {player.direction}\n'
+                    #       f'Camera Scroll X/Y: {self.player_camera.world_shift_x, self.player_camera.world_shift_y}\n'
+                    #       f'L/R Calc Val: {abs(player.rect.left - sprite.rect.right), abs(player.rect.right - sprite.rect.left)}\n'
+                    #       f'Player State X: {player.player_state_x}')
                     # Right Collision #
                     player.rect.right = sprite.rect.left
                     player.direction.x = 0
@@ -83,8 +131,14 @@ class Level:
 
         for sprite in self.tiles.sprites():
             if sprite.rect.colliderect(player.rect):
+
+                print(f'Vertical Collision Left:\n'
+                          f'Player Direction X/Y: {player.direction}\n'
+                          f'Camera Scroll X/Y: {self.player_camera.world_shift_x, self.player_camera.world_shift_y}\n'
+                          f'L/R Calc Val: {abs(player.rect.left - sprite.rect.right), abs(player.rect.right - sprite.rect.left)}\n'
+                          f'Player State X: {player.player_state_x}\n')
+
                 sprite.image.fill('purple')                     # For testing purposes. Can be commented out.
-                
                 if player.direction.y > 0:
                     # Floor Collision #
                     player.rect.bottom = sprite.rect.top
@@ -93,6 +147,11 @@ class Level:
                     player.direction.y = 0
                     player.on_ground = True
                 if player.direction.y < 0:
+                    # print(f'Ceiling Collision:\n'
+                    #       f'Player Direction X/Y: {player.direction}\n'
+                    #       f'Camera Scroll X/Y: {self.player_camera.world_shift_x, self.player_camera.world_shift_y}\n'
+                    #       f'L/R Calc Val: {abs(player.rect.left - sprite.rect.right), abs(player.rect.right - sprite.rect.left)}\n'
+                    #       f'Player State X: {player.player_state_x}')
                     # Ceiling Collision #
                     player.rect.top = sprite.rect.bottom
                     if self.player_camera.world_shift_y != 0:    # Corrects ceiling collision bugs at scroll borders.
@@ -110,6 +169,7 @@ class Level:
         self.level_camera()
         self.player.draw(self.display_surface)
         self.draw_stat_bars()
+        self.draw_debug_panel()
 
         # Player
         self.player.update()
