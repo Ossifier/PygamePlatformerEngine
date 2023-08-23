@@ -13,7 +13,6 @@ class Player(pygame.sprite.Sprite):
         self.sprite_dict = self.sprite_sheet.build_sprite_dict(self.animation_states)
 
         # Player Animations
-        # self.frame_index = 0
         self.image = self.sprite_dict['idle'][self.sprite_sheet.current_frame]
         self.rect = self.image.get_rect(topleft=pos)
 
@@ -23,10 +22,11 @@ class Player(pygame.sprite.Sprite):
 
         # Player Running Attributes #
         self.direction = pygame.math.Vector2(0, 0)
-        self.move_speed = 0.25
+        self.move_speed = 1
+        self.move_acceleration = 0.25
         self.max_move_speed = 4
         self.max_running_speed = self.max_move_speed * 2
-        self.gravity = 0.1
+        self.gravity = 1
         self.max_falling_speed = 10
 
         # Player Jumping Attributes #
@@ -53,7 +53,7 @@ class Player(pygame.sprite.Sprite):
         self.winded = False                           # 'Winded' simulates running out of breath while running/jumping.
 
         # Player Winded Stats:
-        self.winded_reset_threshold = 0.5           # % of stam bar that needs to be filled to clear Winded status.
+        self.winded_reset_threshold = 0.25           # % of stam bar that needs to be filled to clear Winded status.
         self.winded_stamina_recharge_penalty = 0.125    # % reduction of stam bar recharge on being Winded.
         self.winded_stamina_jump_penalty = 0.5
 
@@ -69,9 +69,9 @@ class Player(pygame.sprite.Sprite):
                 if self.direction.x >= self.max_move_speed:
                     pass
                 else:
-                    self.direction.x += self.move_speed
+                    self.direction.x += self.move_acceleration
             elif self.direction.x <= 0:
-                self.direction.x += self.move_speed * 3
+                self.direction.x += self.move_acceleration * 3
 
         # Running Left
         elif keys[pygame.K_LEFT]:
@@ -79,15 +79,15 @@ class Player(pygame.sprite.Sprite):
                 if self.direction.x <= -self.max_move_speed:
                     pass
                 else:
-                    self.direction.x -= self.move_speed
+                    self.direction.x -= self.move_acceleration
             elif self.direction.x >= 0:
-                self.direction.x -= self.move_speed * 3
+                self.direction.x -= self.move_acceleration * 3
 
         else:
             if self.direction.x > 0.2:
-                self.direction.x -= self.move_speed
+                self.direction.x -= self.move_acceleration
             elif self.direction.x <= 0.2:
-                self.direction.x += self.move_speed
+                self.direction.x += self.move_acceleration
 
             if -0.5 < self.direction.x < 0.5:
                 self.direction.x = 0
@@ -111,9 +111,9 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_d] and self.winded is False:
             self.running = True
             if self.direction.x < self.max_running_speed and keys[pygame.K_RIGHT] is True:
-                self.direction.x += self.move_speed
+                self.direction.x += self.move_acceleration
             if self.direction.x > -self.max_running_speed and keys[pygame.K_LEFT] is True:
-                self.direction.x -= self.move_speed
+                self.direction.x -= self.move_acceleration
         else:
             self.running = False
 
@@ -127,16 +127,16 @@ class Player(pygame.sprite.Sprite):
             self.player_state_x = 'idle'
 
         if self.direction.x > 0 and keys[pygame.K_RIGHT] is True:
-            self.player_state_x = 'running right'
+            self.player_state_x = 'mov Rt'
             self.player_facing_direction = 'right'
         elif self.direction.x > 0 and keys[pygame.K_LEFT] is True:
-            self.player_state_x = 'running right turning left'
+            self.player_state_x = 'mov Rt turn Lt'
 
         if self.direction.x < 0 and keys[pygame.K_LEFT] is True:
-            self.player_state_x = 'running left'
+            self.player_state_x = 'mov Lt'
             self.player_facing_direction = 'left'
         elif self.direction.x < 0 and keys[pygame.K_RIGHT] is True:
-            self.player_state_x = 'running left turning right'
+            self.player_state_x = 'mov Lt turn Rt'
 
         # Vertical Player States
         if self.direction.y > 1:
@@ -166,12 +166,16 @@ class Player(pygame.sprite.Sprite):
         refactoring this in some way."""
 
         # Jump if Player is on Ground #
-        if self.on_ground is True:
+        if self.on_ground is True and self.stamina > 0 and self.current_jump_power > 0:
             self.jumping = True
             self.on_ground = False
             self.direction.y = self.jump_speed
         elif self.current_jump_power > 0 and self.winded is False:
             self.direction.y = self.jump_speed
+
+        # Set Jumping to False if Jump Power Depleted.
+        if self.current_jump_power <= 1:
+            self.jumping = False
 
     def stamina_handler(self):
         """NOTES: This function manages the player's stamina during actions like moving and jumping."""
@@ -209,9 +213,9 @@ class Player(pygame.sprite.Sprite):
 
         # Slow Down Player if Sprint Button Isn't Held #
         if self.player_state_x == 'running left' and (self.running is False and self.direction.x < -self.max_move_speed):
-            self.direction.x += self.move_speed * 0.5
+            self.direction.x += self.move_acceleration * 0.5
         elif self.player_state_x == 'running right' and (self.running is False and self.direction.x > self.max_move_speed):
-            self.direction.x -= self.move_speed * 0.5
+            self.direction.x -= self.move_acceleration * 0.5
 
     def jump_power_handler(self):
         """NOTES This function handles jump power recharging mechanics. Basically, whenever the player is on the ground,
@@ -282,3 +286,6 @@ class Player(pygame.sprite.Sprite):
         self.sprinting_handler()
         self.jump_power_handler()
         self.animate_player()
+
+        # print(f'Player X/Y: {self.direction}')
+        # print(f'Player Jumping X: {self.jumping}')
