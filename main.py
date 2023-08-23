@@ -11,6 +11,9 @@ FPS = 60
 
 # Main Game Loop #
 while True:
+
+    level.fps = clock.get_fps()             # For Debug Panel
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
