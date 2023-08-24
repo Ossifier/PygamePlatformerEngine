@@ -45,13 +45,13 @@ class CameraGroup:
 
         if target_center_x < screen_width * self.scroll_threshold_left and target_dir_x < 0:
             self.world_shift_x = -round(target_dir_x)
-            target.speed = 0
+            target.move_speed = 0
         elif target_center_x > screen_width * self.scroll_threshold_right and target_dir_x > 0:
             self.world_shift_x = -round(target_dir_x)
-            target.speed = 0
+            target.move_speed = 0
         else:
             self.world_shift_x = 0
-            target.speed = 1
+            target.move_speed = 1
             
     def scroll_y_follow(self, target):
         """NOTES: This function scrolls the screen horizontally as the target approaches the edge of a specified
