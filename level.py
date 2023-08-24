@@ -1,6 +1,6 @@
 import pygame
 from tiles import Tile
-from settings import tile_size, screen_width, screen_height
+from settings import tile_size
 from player import Player
 from camera import CameraGroup
 
@@ -59,6 +59,8 @@ class Level:
         DK_GREY = (35, 35, 35)
 
         fps = font.render(f'FPS: {round(self.fps, 3)}', True, WHITE)
+        pos_x = font.render(f'Pos X: {round(player.rect.centerx, 3)}', True, WHITE)
+        pos_y = font.render(f'Pos Y: {round(player.rect.centery, 3)}', True, WHITE)
         dir_x = font.render(f'Dir X: {round(player.direction.x, 3)}', True, WHITE)
         dir_y = font.render(f'Dir Y: {round(player.direction.y, 3)}', True, WHITE)
         w_shft_x = font.render(f'Wld_Shft X: {round(self.player_camera.world_shift_x, 3)}', True, WHITE)
@@ -70,20 +72,20 @@ class Level:
         jump_pwr = font.render(f'Jump Pwr: {player.current_jump_power}', True, WHITE)
         stam = font.render(f'Stamina: {player.stamina}', True, WHITE)
 
-        
-
-        pygame.draw.rect(self.display_surface, DK_GREY, (940, 10, 250, 175))
+        pygame.draw.rect(self.display_surface, DK_GREY, (940, 10, 250, 205))
         self.display_surface.blit(fps, (950, 15))
-        self.display_surface.blit(dir_x, (950, 30))
-        self.display_surface.blit(dir_y, (950, 45))
-        self.display_surface.blit(w_shft_x, (950, 60))
-        self.display_surface.blit(w_shft_y, (950, 75))
-        self.display_surface.blit(state_x, (950, 90))
-        self.display_surface.blit(state_y, (950, 105))
-        self.display_surface.blit(on_grnd, (950, 120))
-        self.display_surface.blit(jump, (950, 135))
-        self.display_surface.blit(jump_pwr, (950, 150))
-        self.display_surface.blit(stam, (950, 165))
+        self.display_surface.blit(pos_x, (950, 30))
+        self.display_surface.blit(pos_y, (950, 45))
+        self.display_surface.blit(dir_x, (950, 60))
+        self.display_surface.blit(dir_y, (950, 75))
+        self.display_surface.blit(w_shft_x, (950, 90))
+        self.display_surface.blit(w_shft_y, (950, 105))
+        self.display_surface.blit(state_x, (950, 120))
+        self.display_surface.blit(state_y, (950, 135))
+        self.display_surface.blit(on_grnd, (950, 150))
+        self.display_surface.blit(jump, (950, 165))
+        self.display_surface.blit(jump_pwr, (950, 180))
+        self.display_surface.blit(stam, (950, 195))
 
     def horizontal_movement_collision(self):
         """NOTES: This function controls horizontal collision with objects. If a collision is detected, the player
@@ -98,7 +100,6 @@ class Level:
 
         for sprite in self.tiles.sprites():
             if sprite.rect.colliderect(player.rect):
-
                 sprite.image.fill('orange')     # For collision type testing purposes. Can be commented out.
                 if abs(player.rect.left - sprite.rect.right) < abs(player.rect.right - sprite.rect.left):
                     player.rect.left = sprite.rect.right
@@ -117,6 +118,7 @@ class Level:
 
         for sprite in self.tiles.sprites():
             if sprite.rect.colliderect(player.rect):
+
                 sprite.image.fill('purple')                     # For testing purposes. Can be commented out.
                 if player.direction.y > 0:
                     # Floor Collision #
@@ -136,15 +138,15 @@ class Level:
         """NOTES: This function runs the level and performs updates. Called in the main.py file. The order of functions
         is very important, and misordering especially collision functions has the potential to break the level and
         player behavior."""
-        # Level Tiles
+        # Level Setup
         self.tiles.update(self.player_camera.world_shift_x, self.player_camera.world_shift_y)
         self.tiles.draw(self.display_surface)
         self.level_camera()
+
+        # Player Setup
         self.player.draw(self.display_surface)
         self.draw_stat_bars()
         self.draw_debug_panel()
-
-        # Player
         self.player.update()
         self.horizontal_movement_collision()
         self.vertical_movement_collision()
