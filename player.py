@@ -26,6 +26,7 @@ class Player(pygame.sprite.Sprite):
         self.move_acceleration = 0.25
         self.max_move_speed = 4
         self.max_running_speed = self.max_move_speed * 2
+        # self.gravity = 0.098723234234                 ---> DEBUG/RETEST THIS, TO DO LATER
         self.gravity = 1
         self.max_falling_speed = 10
 
@@ -227,20 +228,15 @@ class Player(pygame.sprite.Sprite):
         ########################
         ### FOR TESTING ONLY ###
         ########################
+        player_sprite = self.sprite_dict[self.player_state_x_test][self.sprite_sheet.current_frame]
 
-        # Retrieve current sprite frame #
+        # Retrieve Current Sprite Frame #
         self.sprite_sheet.current_frame = animate.animate_sprite_dict(
             self.sprite_sheet,
             self.player_state_x_test)
 
         # Flip image based on direction and animate. #
-        if self.player_facing_direction == 'right':
-            self.image = self.sprite_dict[self.player_state_x_test][self.sprite_sheet.current_frame]
-        elif self.player_facing_direction == 'left':
-            img_flip = pygame.transform.flip(
-                self.sprite_dict[self.player_state_x_test][self.sprite_sheet.current_frame],
-                True, False)
-            self.image = img_flip
+        self.image = animate.flip_img_xy(self.player_facing_direction, player_sprite)
 
         # On Ground Animations #
         if self.on_ground is True:
@@ -258,7 +254,7 @@ class Player(pygame.sprite.Sprite):
                 self.player_state_x_test = 'idle'
 
         # Falling Animations #
-        if self.on_ground is False and self.jumping is False and self.direction.y >= 0:
+        elif self.on_ground is False and self.jumping is False and self.direction.y > 0:
             if self.player_state_x_test != 'falling':
                 self.sprite_sheet.current_frame = 0
             self.player_state_x_test = 'falling'
@@ -270,9 +266,12 @@ class Player(pygame.sprite.Sprite):
 
         # Jumping Animations #
         elif self.on_ground is False and self.jumping is True or self.direction.y < 0:        # Jump or Dir for springs.
-            if self.player_state_x_test != 'jumping':
-                self.sprite_sheet.current_frame = 0
-            self.player_state_x_test = 'jumping'
+            if self.player_state_y == 'ascending':
+                
+                if self.player_state_x_test != 'jumping':
+                    self.sprite_sheet.current_frame = 0
+                self.player_state_x_test = 'jumping'
+            
 
         ########################
         ### FOR TESTING ONLY ###
