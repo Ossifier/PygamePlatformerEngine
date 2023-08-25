@@ -2,15 +2,14 @@
 A simple 2D platformer engine written in Python/Pygame. Contains some simple souls-like elements such as stamina handling for flavor, but this logic may be removed in a future branch.
 
 ## TO DO:
-1. Fix Low-Grav Collision Bug where Vertical Collision = Horizontal Collision when scrolling top. 
-2. Implement delta-time frame interpolation to the game. This will be a big project.
-3. Fix state-switching bug when player is jumping between ceiling/floor (rapid player_state flipping).
-4. Finish player character spritesheet so development can proceed.
-5. Create art for the game.
-6. Begin planning zones, level transitions, and maps.
+1. Finish player character spritesheet so development can proceed.
+2. Rewrite stamina_handler function in player.py to adequately address how to handle stamina when in the ground vs. in the air.
+3. Begin planning zones, level transitions, and maps.
+4. Fix Low-Grav Collision Bug where Vertical Collision = Horizontal Collision when scrolling top. 
+5. Implement delta-time frame interpolation to the game. This will be a big project.
 
 ## IN PROGRESS:
-1. Complete comments for new code/functions.
+1. Create art for the game.
 
 ## TO PLAN:
 1. Tighten the current player tracking camera so that feels much smoother for the player.
@@ -30,3 +29,4 @@ A simple 2D platformer engine written in Python/Pygame. Contains some simple sou
 9. Develop the logic for how the game will handle animations for players and other entities.
 10. Implement functionality to gather information on the player state (idling, running, jumping, falling, attacking, taking damage, ect.
 11. Fix level layout decoupling/drifting when screen scrolling (due to rounding errors).
+12. Fix state-switching bug when player is jumping between ceiling/floor.
