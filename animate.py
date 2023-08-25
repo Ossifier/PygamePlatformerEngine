@@ -2,13 +2,28 @@ import pygame
 from spritesheets import SpriteSheet
 
 
-def flip_img_xy(direction, sprite):
-    """NOTES: Flips the image based on which direction the entity is facing."""
-    if direction is 'right':
+def flip_img_xy(sprite, direction):
+    """NOTES: Flips the image based horizontally depending on which direction the entity is facing."""
+    if direction == 'right':
         return sprite
     else:
         flipped_sprite = pygame.transform.flip(sprite, True, False)
         return flipped_sprite
+
+    
+def set_new_state(sprite, new_state, old_state, start_frame):
+    """NOTES: Changes entity states. The first animation frame of the new state can be set with start_fr."""
+    if new_state != old_state:
+        sprite.current_frame = start_frame
+    return new_state
+
+
+def animate_sprite_slice(sprite, start_fr, end_fr):
+    """NOTES: Animates a subsection of a sprite list."""
+    if sprite.current_frame == end_fr and sprite.current_time == sprite.animation_speed:
+        sprite.current_frame = start_fr
+        sprite.current_time = 0
+
 
 def animate_sprite_dict(sprite, state):
     """NOTES: Returns the next frame in the animation sequence for a sprite dictionary. Uses the sprite's loaded data,
