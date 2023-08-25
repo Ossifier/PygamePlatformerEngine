@@ -44,9 +44,9 @@ class Player(pygame.sprite.Sprite):
         self.stamina_recharge_rate = 2
 
         # Player States #
-        self.player_state_x = 'idle'
-        self.player_state_x_test = 'idle'             # This is for testing animations, to be deleted.
-        self.player_state_y = 'on ground'
+        self.player_state = 'idle'
+        self.collision_state_x = 'none'
+        self.collision_state_y = 'none'
         self.player_facing_direction = 'right'
         self.jumping = False
         self.on_ground = True
@@ -97,11 +97,9 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_SPACE]:
             if self.on_ground is True and self.current_jump_power >= 6:
                 self.jump()
-                self.on_ground = False
-            elif self.on_ground is False and self.jumping is True and self.player_state_y == 'ascending':
-                if self.current_jump_power > 0:
-                    self.jump()
-                    self.current_jump_power -= 1
+            elif self.on_ground is False and self.jumping is True and self.current_jump_power > 0:
+                self.jump()
+                self.current_jump_power -= 1
             else:
                 self.jumping = False
 
@@ -118,40 +116,51 @@ class Player(pygame.sprite.Sprite):
         else:
             self.running = False
 
-    def get_player_states(self):
-        """NOTES: This function retrieves the player states for both horizontal and vertical movement. This information
-        is used to control player movement and behavior, and will also be used for specifying animations."""
+    def assign_player_states(self):
+        """NOTES: This function assigns the player states for both horizontal and vertical movement. This information
+        is used to control player movement and behavior, and is also be used for specifying animations."""
         keys = pygame.key.get_pressed()
+        sprite = self.sprite_sheet
+        current_state = self.player_state
+
+        # Player Facing Direction
+        if self.direction.x > 0:
+            self.player_facing_direction = 'right'
+        elif self.direction.x < 0:
+            self.player_facing_direction = 'left'
+
+        # FIX THIS!!!!!! Check Debug Panel #
+        if self.collision_state_x == 'right' and self.direction.x < 0:
+            self.collision_state_x = 'none'
+        elif self.collision_state_x == 'left' and self.direction.x > 0:
+            self.collision_state_x = 'none'
 
         # Horizontal Player States
-        if self.direction.x == 0 and self.on_ground is True:
-            self.player_state_x = 'idle'
-
-        if self.direction.x > 0 and keys[pygame.K_RIGHT] is True:
-            self.player_state_x = 'mov Rt'
-            self.player_facing_direction = 'right'
-        elif self.direction.x > 0 and keys[pygame.K_LEFT] is True:
-            self.player_state_x = 'mov Rt turn Lt'
-
-        if self.direction.x < 0 and keys[pygame.K_LEFT] is True:
-            self.player_state_x = 'mov Lt'
-            self.player_facing_direction = 'left'
-        elif self.direction.x < 0 and keys[pygame.K_RIGHT] is True:
-            self.player_state_x = 'mov Lt turn Rt'
-
-        # Vertical Player States
-        if self.direction.y > 1:
-            self.player_state_y = 'descending'
-            self.on_ground = False
-        elif self.direction.y < 0:
-            self.player_state_y = 'ascending'
-
-        # Grounded Player States
-        if self.direction.y == 0:
-            if self.on_ground is False:
-                pass
+        if self.on_ground is True:
+            if abs(self.direction.x) > self.max_running_speed - 1 and keys[pygame.K_d]:
+                self.player_state = animate.set_new_state(sprite, 'running', current_state, 0)
+            elif self.direction.x > 0 or keys[pygame.K_RIGHT]:
+                self.player_state = animate.set_new_state(sprite, 'walking', current_state, 0)
+            elif self.direction.x < 0 or keys[pygame.K_LEFT]:
+                self.player_state = animate.set_new_state(sprite, 'walking', current_state, 0)
             else:
-                self.player_state_y = 'on ground'
+                self.player_state = animate.set_new_state(sprite, 'idle', current_state, 0)
+
+
+        # Falling State
+        if self.direction.y > 1:
+            self.player_state = animate.set_new_state(sprite, 'falling', current_state, 0)
+            self.on_ground = False
+            if self.on_ground is False and self.jumping is False:
+
+                animate.animate_sprite_slice(sprite, 6, 9)
+
+        # Jumping
+        if self.on_ground is False and self.jumping is True or self.direction.y < 0:    # Jump or Dir for springs.
+            if self.collision_state_y == 'ceiling':                                     # Fixes Bug/Ceiling Animation Bug.
+                pass
+            else: 
+                self.player_state = animate.set_new_state(sprite, 'jumping', current_state, 0)
 
     def apply_gravity(self):
         """NOTES: This function applies gravity to the player. Rate of speed increase is controlled by self.gravity,
@@ -182,7 +191,7 @@ class Player(pygame.sprite.Sprite):
         """NOTES: This function manages the player's stamina during actions like moving and jumping."""
         if (self.running is True) or abs(self.direction.x) > self.max_move_speed:
             # Sprinting Stamina Draining Mechanics #
-            if self.player_state_x != 'idle' and self.player_state_y != 'descending':
+            if self.player_state != 'idle':
                 if self.stamina > 0:
                     self.stamina -= 1
                 else:
@@ -190,7 +199,7 @@ class Player(pygame.sprite.Sprite):
 
         else:
             # Sprinting Stamina Recharge Mechanics #
-            if self.player_state_y == 'on ground' and (self.running is False or self.player_state_x == 'idle'):
+            if self.on_ground is True and (self.running is False or self.player_state == 'idle'):
                 if self.stamina <= (self.max_stamina - self.stamina_recharge_rate) and self.winded is False:
                     self.stamina += self.stamina_recharge_rate
                 elif self.stamina <= self.max_stamina - self.stamina_recharge_rate and self.winded is True:
@@ -213,9 +222,9 @@ class Player(pygame.sprite.Sprite):
         to their max running speed as long as they aren't holding the sprint button."""
 
         # Slow Down Player if Sprint Button Isn't Held #
-        if self.player_state_x == 'running left' and (self.running is False and self.direction.x < -self.max_move_speed):
+        if self.player_state == 'walking' and (self.running is False and self.direction.x < -self.max_move_speed):
             self.direction.x += self.move_acceleration * 0.5
-        elif self.player_state_x == 'running right' and (self.running is False and self.direction.x > self.max_move_speed):
+        elif self.player_state == 'walking' and (self.running is False and self.direction.x > self.max_move_speed):
             self.direction.x -= self.move_acceleration * 0.5
 
     def jump_power_handler(self):
@@ -225,66 +234,22 @@ class Player(pygame.sprite.Sprite):
             self.current_jump_power += self.jump_recharge_rate
 
     def animate_player(self):
-        ########################
-        ### FOR TESTING ONLY ###
-        ########################
-        player_sprite = self.sprite_dict[self.player_state_x_test][self.sprite_sheet.current_frame]
+        """NOTES: Animates the player sprite using the sprite_sheet dictionary and the player state as dictionary keys."""
+        player_sprite = self.sprite_dict[self.player_state][self.sprite_sheet.current_frame]
 
         # Retrieve Current Sprite Frame #
         self.sprite_sheet.current_frame = animate.animate_sprite_dict(
             self.sprite_sheet,
-            self.player_state_x_test)
+            self.player_state)
 
         # Flip image based on direction and animate. #
-        self.image = animate.flip_img_xy(self.player_facing_direction, player_sprite)
-
-        # On Ground Animations #
-        if self.on_ground is True:
-            if self.direction.x >= 8 or self.direction.x <= -8:
-                if self.player_state_x_test != 'running':
-                    self.sprite_sheet.current_frame = 0
-                self.player_state_x_test = 'running'
-            elif self.direction.x != 0:
-                if self.player_state_x_test != 'walking':
-                    self.sprite_sheet.current_frame = 0
-                self.player_state_x_test = 'walking'
-            else:
-                if self.player_state_x_test != 'idle':
-                    self.sprite_sheet.current_frame = 0
-                self.player_state_x_test = 'idle'
-
-        # Falling Animations #
-        elif self.on_ground is False and self.jumping is False and self.direction.y > 0:
-            if self.player_state_x_test != 'falling':
-                self.sprite_sheet.current_frame = 0
-            self.player_state_x_test = 'falling'
-
-            if self.sprite_sheet.current_frame == 9 and self.sprite_sheet.current_time == self.sprite_sheet.animation_speed:
-                self.sprite_sheet.current_frame = 6
-                self.sprite_sheet.current_time = 0
-                pass
-
-        # Jumping Animations #
-        elif self.on_ground is False and self.jumping is True or self.direction.y < 0:        # Jump or Dir for springs.
-            if self.player_state_y == 'ascending':
-                
-                if self.player_state_x_test != 'jumping':
-                    self.sprite_sheet.current_frame = 0
-                self.player_state_x_test = 'jumping'
-            
-
-        ########################
-        ### FOR TESTING ONLY ###
-        ########################
+        self.image = animate.flip_img_xy(player_sprite, self.player_facing_direction)
 
     def update(self):
-        """NOTES: Updates the player's state attributes and inputs."""
-        self.get_player_states()
+        """NOTES: Updates the player's state, attributes and inputs."""
+        self.assign_player_states()
         self.get_player_inputs()
-        self.stamina_handler()
+        # self.stamina_handler()                            # Commented Out for Testing/Convenience.
         self.sprinting_handler()
         self.jump_power_handler()
         self.animate_player()
-
-        # print(f'Player X/Y: {self.direction}')
-        # print(f'Player Jumping X: {self.jumping}')
