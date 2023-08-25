@@ -1,80 +1,43 @@
-from settings import screen_width, screen_height
+import pygame
+from spritesheets import SpriteSheet
 
 
-class CameraGroup:
-    def __init__(self):
+def flip_img_xy(sprite, direction):
+    """NOTES: Flips the image based horizontally depending on which direction the entity is facing."""
+    if direction == 'right':
+        return sprite
+    else:
+        flipped_sprite = pygame.transform.flip(sprite, True, False)
+        return flipped_sprite
 
-        # World Shift Variables #
-        self.world_shift_x = 0
-        self.world_shift_y = 0
-        self.scroll_threshold_left = 0.25
-        self.scroll_threshold_right = 0.5
-        self.scroll_threshold_top = 0.5
-        self.scroll_threshold_bottom = 0.9
-        
-    def snap_camera(self, target, map_layout, offset_x, offset_y):
-        """NOTES: This function snaps the camera to an object. It works by shifting the player sprite and level sprites
-        simultaneously by an offset that is calculated by the target object's original x/y coordinates (obj_x/y), and
-        the offset_x/y variables. These offset variables are percentages, and must be between 0 and 1 for the snap to
-        land within the display screen.
-        This function requires a target sprite (target), and the enumerated level layout (map_layout) so that the
-        object/level offsets can be applied appropriately."""
-        # Calculate Offsets #
-        cam_adjust_x = screen_width * offset_x
-        cam_adjust_y = screen_height * offset_y
-        level_shift_x = target.rect.centerx - cam_adjust_x
-        level_shift_y = target.rect.centery - cam_adjust_y
+    
+def set_new_state(sprite, new_state, old_state, start_frame):
+    """NOTES: Changes entity states. The first animation frame of the new state can be set with start_fr."""
+    if new_state != old_state:
+        sprite.current_frame = start_frame
+    return new_state
 
-        # Center Object on Screen #
-        target.rect.centerx = cam_adjust_x
-        target.rect.centery = cam_adjust_y
 
-        # Shift Level to Object's Location via Offset #
-        for sprite in map_layout:
-            sprite.rect.centerx -= level_shift_x
-            sprite.rect.centery -= level_shift_y
+def animate_sprite_slice(sprite, start_fr, end_fr):
+    """NOTES: Animates a subsection of a sprite list."""
+    if sprite.current_frame == end_fr and sprite.current_time == sprite.animation_speed:
+        sprite.current_frame = start_fr
+        sprite.current_time = 0
 
-        print('Centered from CameraGroup_Test')  # This is for testing purposes to ensure that importing works properly.
-        
-    def scroll_x_follow(self, target):
-        """NOTES: This function scrolls the screen horizontally as the player approaches the edge of a specified
-        threshold. These scrolling thresholds are controlled by the Level attributes self.scroll_threshold_leftx and
-        self.scroll_threshold_rightx. They can be adjusted to meet the needs of a particular stage."""
-        target_center_x = target.rect.centerx
-        target_dir_x = target.direction.x
 
-        if target_center_x < screen_width * self.scroll_threshold_left and target_dir_x < 0:
-            self.world_shift_x = -round(target_dir_x)
-            target.move_speed = 0
-        elif target_center_x > screen_width * self.scroll_threshold_right and target_dir_x > 0:
-            self.world_shift_x = -round(target_dir_x)
-            target.move_speed = 0
-        else:
-            self.world_shift_x = 0
-            target.move_speed = 1
-            
-    def scroll_y_follow(self, target):
-        """NOTES: This function scrolls the screen horizontally as the target approaches the edge of a specified
-        threshold. This particular function follows the target at the scroll threshold in the direction they are
-        travelling to keep them within the inside of the screen.
-        Special adjustments are made for when the target reaches the threshold to adjust the to ensure that collision
-        bugs don't occur while the player is scrolling and landing/hitting the ceiling."""
-        # Bottom Screen Scrolling #
-        if target.rect.centery > screen_height * self.scroll_threshold_bottom:
-            if self.world_shift_y == 0:                         # Border Offset
-                target.rect.centery += target.direction.y
+def animate_sprite_dict(sprite, state):
+    """NOTES: Returns the next frame in the animation sequence for a sprite dictionary. Uses the sprite's loaded data,
+    along with its current state to check against the current number of frames that have elapsed since the frame
+    changed. If it is equal or larger, then it adds to the frame index, and resets the frame index back to zero if it is
+    larger than the length of the state frame list."""
+    sprite.num_frames = len(sprite.data['animationStates'][state]['frameList'])
 
-            self.world_shift_y = -round(target.direction.y)
-            target.rect.centery -= target.direction.y
+    if sprite.current_time != 0 and sprite.current_time % sprite.animation_speed == 0:
+        if sprite.current_frame >= sprite.num_frames - 1:
+            sprite.current_frame = -1
+        sprite.current_frame += 1
+        sprite.current_time = -1
 
-        # Top Screen Scrolling #
-        elif target.rect.centery < screen_height * self.scroll_threshold_top and target.direction.y < 0:
-            if self.world_shift_y == 0:                         # Border Offset
-                target.rect.centery += target.direction.y
+    sprite.current_time += 1
 
-            self.world_shift_y = -round(target.direction.y - 1)
-            target.rect.centery -= target.direction.y
-
-        # Player Within Screen Scrolling Boundaries #
-        else:
-            self.world_shift_y = 0
+    return sprite.current_frame
