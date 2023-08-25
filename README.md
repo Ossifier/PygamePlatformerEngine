@@ -10,6 +10,7 @@ A simple 2D platformer engine written in Python/Pygame. Contains some simple sou
 
 ## IN PROGRESS:
 1. Create art for the game.
+2. Fix small bug when hold-jumping from out of a 64h px corridor.
 
 ## TO PLAN:
 1. Tighten the current player tracking camera so that feels much smoother for the player.
