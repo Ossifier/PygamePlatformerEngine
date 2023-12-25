@@ -1,7 +1,6 @@
 import pygame
 from spritesheets import SpriteSheet
 import animate
-# from main_test import Del_Time
 
 
 class Player(pygame.sprite.Sprite):
@@ -12,19 +11,20 @@ class Player(pygame.sprite.Sprite):
         self.animation_states = self.sprite_sheet.build_animation_state_list()
         self.sprite_dict = self.sprite_sheet.build_sprite_dict(self.animation_states)
 
+        # Player DT:
+        self.frame_correct = 0
+        self.dt = 0
+
         # Player Animations
         self.image = self.sprite_dict['idle'][self.sprite_sheet.current_frame]
         self.rect = self.image.get_rect(topleft=pos)
 
-        # Player Animation Tests
-        self.clock = pygame.time.Clock()
-        self.delta_time = self.clock.tick(60) / 1000
-
         # Player Running Attributes #
         self.direction = pygame.math.Vector2(0, 0)
-        self.move_speed = 1
         self.move_acceleration = 0.25
+        self.move_speed = 0
         self.max_move_speed = 4
+        self.max_move_speed_test = 40000
         self.max_running_speed = self.max_move_speed * 2
         # self.gravity = 0.098723234234                 ---> DEBUG/RETEST THIS, TO DO LATER
         self.gravity = 1
@@ -146,7 +146,6 @@ class Player(pygame.sprite.Sprite):
             else:
                 self.player_state = animate.set_new_state(sprite, 'idle', current_state, 0)
 
-
         # Falling State
         if self.direction.y > 1:
             self.player_state = animate.set_new_state(sprite, 'falling', current_state, 0)
@@ -156,8 +155,8 @@ class Player(pygame.sprite.Sprite):
                 animate.animate_sprite_slice(sprite, 6, 9)
 
         # Jumping
-        if self.on_ground is False and self.jumping is True or self.direction.y < 0:    # Jump or Dir for springs.
-            if self.collision_state_y == 'ceiling':                                     # Fixes Bug/Ceiling Animation Bug.
+        if self.on_ground is False and self.jumping is True or self.direction.y < 0:  # Jump or Dir for springs.
+            if self.collision_state_y == 'ceiling':                                   # Fixes Bug/Ceiling Animation Bug.
                 pass
             else: 
                 self.player_state = animate.set_new_state(sprite, 'jumping', current_state, 0)
@@ -169,7 +168,11 @@ class Player(pygame.sprite.Sprite):
             self.direction.y = self.max_falling_speed
         else:
             self.direction.y += self.gravity
-        self.rect.y += self.direction.y
+        self.rect.y += self.direction.y * self.frame_correct
+
+        print(f'PLAYER FALL SPEED - CORRECT: {self.direction.y * self.frame_correct}')
+        print(f'PLAYER FALL SPEED - DIR: {self.direction.y}')
+        print(f'PLAYER FALL SPEED - MULT: {self.frame_correct}\n')
 
     def jump(self):
         """NOTES: This function controls player jumping behavior. Unless this grows in complexity, it may be worth
@@ -234,7 +237,8 @@ class Player(pygame.sprite.Sprite):
             self.current_jump_power += self.jump_recharge_rate
 
     def animate_player(self):
-        """NOTES: Animates the player sprite using the sprite_sheet dictionary and the player state as dictionary keys."""
+        """NOTES: Animates the player sprite using the sprite_sheet dictionary and the player state as dictionary
+        keys."""
         player_sprite = self.sprite_dict[self.player_state][self.sprite_sheet.current_frame]
 
         # Retrieve Current Sprite Frame #
