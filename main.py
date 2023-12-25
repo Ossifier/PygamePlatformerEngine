@@ -1,4 +1,4 @@
-import pygame, sys
+import pygame, sys, time
 from settings import *
 from level import Level
 
@@ -9,10 +9,15 @@ clock = pygame.time.Clock()
 level = Level(level_test_3, screen)
 FPS = 60
 
+previous_time = time.time()                                         # For Calculating Frame Interp
+
 # Main Game Loop #
 while True:
+    dt = time.time() - previous_time                                # For Calculating Frame Interp
+    previous_time = time.time()                                     # For Calculating Frame Interp
 
     level.fps = clock.get_fps()                                     # For Debug Panel
+    level.dt = dt                                                   # For Debug Panel / Distribute
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
