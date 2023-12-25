@@ -5,7 +5,13 @@ A simple 2D platformer engine written in Python/Pygame. Contains some simple sou
 1. This branch name has been changed to reflect that this branch is for the version of the engine that includes frame interpolation logic, and changed to be the deafult working branch for this project. The prior main branch has been renamed. If you would like to access the older version, you'll find it there.
 2. Also, I'm back after having been pulled away from this project due to work.
 
-## TO DO:
+## TO DO (Frame Interpolation):
+1. Fully implement frame interpolation for the following piece of logic:
+     i.   Stamina drain/recharge.
+     ii.  Jump Power drain/recharge.
+     iii. Animation cycles.
+
+## TO DO (Other):
 1. Finish player character spritesheet so development can proceed.
 2. Rewrite stamina_handler function in player.py to adequately address how to handle stamina when in the ground vs. in the air.
 3. Begin planning zones, level transitions, and maps.
