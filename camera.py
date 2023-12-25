@@ -4,6 +4,9 @@ from settings import screen_width, screen_height
 class CameraGroup:
     def __init__(self):
 
+        # Frame Correct Multiplier #
+        self.frame_correct = 0
+
         # World Shift Variables #
         self.world_shift_x = 0
         self.world_shift_y = 0
@@ -36,24 +39,26 @@ class CameraGroup:
 
         print('Centered from CameraGroup_Test')  # This is for testing purposes to ensure that importing works properly.
         
-    def scroll_x_follow(self, target):
+    def scroll_x_follow(self, target, fc_mult):
         """NOTES: This function scrolls the screen horizontally as the player approaches the edge of a specified
         threshold. These scrolling thresholds are controlled by the Level attributes self.scroll_threshold_leftx and
         self.scroll_threshold_rightx. They can be adjusted to meet the needs of a particular stage."""
         target_center_x = target.rect.centerx
         target_dir_x = target.direction.x
 
+        # print(f'TAR DIR X: {target_dir_x}')
+
         if target_center_x < screen_width * self.scroll_threshold_left and target_dir_x < 0:
-            self.world_shift_x = -round(target_dir_x)
+            self.world_shift_x = -round(target_dir_x * fc_mult)
             target.move_speed = 0
         elif target_center_x > screen_width * self.scroll_threshold_right and target_dir_x > 0:
-            self.world_shift_x = -round(target_dir_x)
+            self.world_shift_x = -round(target_dir_x * fc_mult)
             target.move_speed = 0
         else:
             self.world_shift_x = 0
             target.move_speed = 1
             
-    def scroll_y_follow(self, target):
+    def scroll_y_follow(self, target, fc_mult):
         """NOTES: This function scrolls the screen horizontally as the target approaches the edge of a specified
         threshold. This particular function follows the target at the scroll threshold in the direction they are
         travelling to keep them within the inside of the screen.
@@ -62,18 +67,18 @@ class CameraGroup:
         # Bottom Screen Scrolling #
         if target.rect.centery > screen_height * self.scroll_threshold_bottom:
             if self.world_shift_y == 0:                         # Border Offset
-                target.rect.centery += target.direction.y
+                target.rect.centery += target.direction.y * fc_mult
 
-            self.world_shift_y = -round(target.direction.y)
-            target.rect.centery -= target.direction.y
+            self.world_shift_y = -round(target.direction.y * fc_mult)
+            target.rect.centery -= target.direction.y * fc_mult
 
         # Top Screen Scrolling #
         elif target.rect.centery < screen_height * self.scroll_threshold_top and target.direction.y < 0:
             if self.world_shift_y == 0:                         # Border Offset
-                target.rect.centery += target.direction.y
+                target.rect.centery += target.direction.y * fc_mult
 
-            self.world_shift_y = -round(target.direction.y - 1)
-            target.rect.centery -= target.direction.y
+            self.world_shift_y = -round((target.direction.y - 1) * fc_mult)
+            target.rect.centery -= target.direction.y * fc_mult
 
         # Player Within Screen Scrolling Boundaries #
         else:
