@@ -2,7 +2,8 @@
 A simple 2D platformer engine written in Python/Pygame. Contains some simple souls-like elements such as stamina handling for flavor, but this logic may be removed in a future branch.
 
 ## NOTES:
-1. A new branch has been added for testing Frame Interpolation. This is likely to be a big re-write for a lot of logic that will need some care and thought. For that reason, I've separated it from the main branch for now until I can get all the kinks worked out. I will likely also keep the non-interpolated branch for backup reasons or if someone would prefer that variant.
+1. A new branch has been added for testing Frame Interpolation. This is likely to be a big re-write for a lot of logic that will need some care and thought. For that reason, I've separated it from the main branch for now until I can get all the kinks worked out. I will likely also keep the non-interpolated branch for backup reasons or if someone would prefer that variant. For the most up to date version, please see the frame_interp branch.
+2. Also, I'm back. Work has kept me away from this project until recently.
 
 ## TO DO:
 1. Finish player character spritesheet so development can proceed.
