@@ -31,7 +31,7 @@ class Player(pygame.sprite.Sprite):
         self.max_falling_speed = 10
 
         # Player Jumping Attributes #
-        self.max_jump_power = 16
+        self.max_jump_power = 20
         self.current_jump_power = self.max_jump_power
         self.jump_speed = -12
         self.jump_recharge_rate = 1
@@ -170,9 +170,9 @@ class Player(pygame.sprite.Sprite):
             self.direction.y += self.gravity
         self.rect.y += self.direction.y * self.frame_correct
 
-        print(f'PLAYER FALL SPEED - CORRECT: {self.direction.y * self.frame_correct}')
-        print(f'PLAYER FALL SPEED - DIR: {self.direction.y}')
-        print(f'PLAYER FALL SPEED - MULT: {self.frame_correct}\n')
+        # print(f'PLAYER FALL SPEED - CORRECT: {self.direction.y * self.frame_correct}')
+        # print(f'PLAYER FALL SPEED - DIR: {self.direction.y}')
+        # print(f'PLAYER FALL SPEED - MULT: {self.frame_correct}\n')
 
     def jump(self):
         """NOTES: This function controls player jumping behavior. Unless this grows in complexity, it may be worth
@@ -257,3 +257,6 @@ class Player(pygame.sprite.Sprite):
         self.sprinting_handler()
         self.jump_power_handler()
         self.animate_player()
+
+        print(f'Player Jump State: {self.jumping}')
+        
