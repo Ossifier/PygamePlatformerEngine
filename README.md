@@ -10,6 +10,7 @@ Fully implement interpolation for the following piece of logic:
 1. Stamina drain/recharge.
 2. Jump Power drain/recharge.
 3. Animation cycles.
+4. Find, locate, and correct collision bugs arising from new interpolation logic.
 
 ## TO DO (General):
 1. Finish player character spritesheet so development can proceed.
