@@ -163,15 +163,16 @@ class Level:
                     # Floor Collision #
                     player.rect.bottom = sprite.rect.top
                     if self.player_camera.world_shift_y != 0:     # Corrects landing collision bugs at scroll borders
-                        player.rect.centery -= player.direction.y
+                        player.rect.centery -= player.direction.y * self.frame_correct
                     player.direction.y = 0
                     player.on_ground = True
                 if player.direction.y < 0:
                     # Ceiling Collision #
                     player.rect.top = sprite.rect.bottom
+                    player.jumping = False
                     if self.player_camera.world_shift_y != 0:    # Corrects ceiling collision bugs at scroll borders.
-                        self.player_camera.world_shift_y = 0
-                    player.direction.y = 0
+                        self.player_camera.world_shift_y = 0     # !!! There is still a very rare collision bug at the
+                    player.direction.y = 0                       # scroll threshold !!!
                     player.collision_state_y = 'ceiling'
                 else:
                     player.collision_state_y = 'none'
