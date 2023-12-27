@@ -1,6 +1,5 @@
 import pygame
 from tiles import Tile
-from settings import tile_size
 from player import Player
 from camera import CameraGroup
 
@@ -25,17 +24,17 @@ class Level:
         self.debug = True                          # For Toggling Debug Panel
 
         # Test DT Multiplier
-        self.frame_correct = 0
+        self.game_speed = 0
 
     def calc_test_mult(self):
         player = self.player.sprite
-        self.frame_correct = self.dt * 60
-
-        player.frame_correct = self.frame_correct
+        player.game_speed = self.game_speed
 
     def setup_level(self, layout):
         """NOTES: This function loads the level layout and snaps the screen to the player's location. The layout
         argument can be specified in main.py by loading the appropriately named layout list from settings.py."""
+        tile_size = 64
+
         for row_index, row in enumerate(layout):
             for col_index, cell in enumerate(row):
                 x = col_index * tile_size
@@ -56,8 +55,8 @@ class Level:
         player_sprite = self.player.sprite
         horizontal_movement = (player_sprite.direction.x * player_sprite.move_speed)
 
-        self.player_camera.scroll_x_follow(player_sprite, self.frame_correct)
-        self.player_camera.scroll_y_follow(player_sprite, self.frame_correct)
+        self.player_camera.scroll_x_follow(player_sprite, self.game_speed)
+        self.player_camera.scroll_y_follow(player_sprite, self.game_speed)
 
     def draw_stat_bars(self):
         """NOTES: Draws the Player's Stats as bars. For now, this includes the player's jump power and their stamina."""
@@ -78,7 +77,7 @@ class Level:
         if self.debug is True: 
             fps = font.render(f'FPS: {round(self.fps, 3)}', True, WHITE)
             dt = font.render(f'DT: {round(self.dt, 5)}', True, WHITE)
-            fc_corr = font.render(f'Frame Mult: {round(self.frame_correct, 5)}', True, WHITE)
+            fc_corr = font.render(f'Frame Mult: {round(self.game_speed, 5)}', True, WHITE)
             pos_x = font.render(f'Pos X: {round(player.rect.centerx, 3)}', True, WHITE)
             pos_y = font.render(f'Pos Y: {round(player.rect.centery, 3)}', True, WHITE)
             dir_x = font.render(f'Dir X: {round(player.direction.x, 3)}', True, WHITE)
@@ -87,7 +86,7 @@ class Level:
             w_shft_y = font.render(f'Wld_Shft Y: {round(self.player_camera.world_shift_y, 3)}', True, WHITE)
             on_grnd = font.render(f'On Grnd: {player.on_ground}', True, WHITE)
             jump = font.render(f'Jump: {player.jumping}', True, WHITE)
-            jump_pwr = font.render(f'Jump Pwr: {player.current_jump_power}', True, WHITE)
+            jump_pwr = font.render(f'Jump Pwr: {round(player.current_jump_power, 3)}', True, WHITE)
             stam = font.render(f'Stamina: {player.stamina}', True, WHITE)
 
             pygame.draw.rect(self.display_surface, DK_GREY, (940, 10, 250, 205))
@@ -107,20 +106,23 @@ class Level:
 
             state_x = font.render(f'Ani State: {player.player_state}', True, WHITE)
             p_dir = font.render(f'Face Dir: {player.player_facing_direction}', True, WHITE)
+            col_st_x = font.render(f'Col State X : {player.collision_state_x}', True, WHITE)
+            col_st_y = font.render(f'Col State Y: {player.collision_state_y}', True, WHITE)
             num_fr = font.render(f'Num Frms: {player.sprite_sheet.num_frames}', True, WHITE)
             curr_fr = font.render(f'Curr Frm: {player.sprite_sheet.current_frame + 1}', True, WHITE)
             curr_t = font.render(f'Curr Time: {player.sprite_sheet.current_time}', True, WHITE)
-            col_st_x = font.render(f'Col State X : {player.collision_state_x}', True, WHITE)
-            col_st_y = font.render(f'Col State Y: {player.collision_state_y}', True, WHITE)
+            anim_sp = font.render(f'Anim Spd: {player.sprite_sheet.animation_speed}', True, WHITE)
 
-            pygame.draw.rect(self.display_surface, DK_GREY, (940, 225, 250, 115))
+
+            pygame.draw.rect(self.display_surface, DK_GREY, (940, 225, 250, 130))
             self.display_surface.blit(state_x, (950, 230))
-            self.display_surface.blit(col_st_x, (950, 245))
-            self.display_surface.blit(col_st_y, (950, 260))
-            self.display_surface.blit(p_dir, (950, 275))
+            self.display_surface.blit(p_dir, (950, 245))
+            self.display_surface.blit(col_st_x, (950, 260))
+            self.display_surface.blit(col_st_y, (950, 275))
             self.display_surface.blit(num_fr, (950, 290))
             self.display_surface.blit(curr_fr, (950, 305))
             self.display_surface.blit(curr_t, (950, 320))
+            self.display_surface.blit(anim_sp, (950, 335))
 
             # pygame.draw.rect(self.display_surface, DK_GREY, (940, 350, 250, 115))         # For Addt'l Debug Vals
 
@@ -135,11 +137,11 @@ class Level:
         player = self.player.sprite
         horizontal_movement = (player.direction.x * player.move_speed)
 
-        player.rect.x += round(horizontal_movement * self.frame_correct)
+        player.rect.x += round(horizontal_movement * self.game_speed)
 
         for sprite in self.tiles.sprites():
             if sprite.rect.colliderect(player.rect):
-                sprite.image.fill('orange')     # For collision type testing purposes. Can be commented out.
+                sprite.image.fill('orange')         # For collision type testing purposes. Can be removed.
                 if abs(player.rect.left - sprite.rect.right) < abs(player.rect.right - sprite.rect.left):
                     player.rect.left = sprite.rect.right
                     player.direction.x = 0
@@ -158,12 +160,12 @@ class Level:
         for sprite in self.tiles.sprites():
             if sprite.rect.colliderect(player.rect):
 
-                sprite.image.fill('purple')                     # For testing purposes. Can be commented out.
+                sprite.image.fill('purple')                     # For testing purposes. Can be removed.
                 if player.direction.y > 0:
                     # Floor Collision #
                     player.rect.bottom = sprite.rect.top
-                    if self.player_camera.world_shift_y != 0:     # Corrects landing collision bugs at scroll borders
-                        player.rect.centery -= player.direction.y * self.frame_correct
+                    if self.player_camera.world_shift_y != 0:   # Corrects landing collision bugs at scroll borders
+                        player.rect.centery -= player.direction.y * self.game_speed
                     player.direction.y = 0
                     player.on_ground = True
                 if player.direction.y < 0:
@@ -171,8 +173,8 @@ class Level:
                     player.rect.top = sprite.rect.bottom
                     player.jumping = False
                     if self.player_camera.world_shift_y != 0:    # Corrects ceiling collision bugs at scroll borders.
-                        self.player_camera.world_shift_y = 0     # !!! There is still a very rare collision bug at the
-                    player.direction.y = 0                       # scroll threshold !!!
+                        self.player_camera.world_shift_y = 0     # !!! There is still a very rare collision bug that
+                    player.direction.y = 0                       # occurs at scroll thresholds !!!
                     player.collision_state_y = 'ceiling'
                 else:
                     player.collision_state_y = 'none'
