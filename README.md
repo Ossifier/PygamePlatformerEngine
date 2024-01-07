@@ -1,6 +1,9 @@
 # PygamePlatformerEngine
 A simple 2D platformer engine written in Python/Pygame. Contains some simple souls-like elements such as stamina handling for flavor, but this logic may be removed in a future branch.
 
+## IMPORTANT DEVELOPMENT NOTICE:
+I am currently in the process of rebuilding the engine with a different methodology largely inspired by DaFluffyPotato's work. This is in particular to iron out some of the more troublesome bugs I am encountering with collisions at scroll borders, and to improve overall performance. For this reason, there will be some time before the next branch is pushed to this github. Apologies for the delay!
+
 ## NOTES:
 1. This branch name has been changed to reflect that this branch is for the version of the engine that includes frame interpolation logic, and changed to be the deafult working branch for this project. The prior main branch has been renamed. If you would like to access the older version, you'll find it there.
 2. Also, I'm back after having been pulled away from this project due to work.
