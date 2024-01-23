@@ -7,13 +7,9 @@ This code has been significantly restructured due to troublesome bugs that arose
 This project now uses an engine design more similar to DaFluffyPotato's implementation, mainly for performance reasons. However, over time, significant changes to the engine are planned.
 
 ## TO DO (General):
-TBD
 
 ## IN PROGRESS:
-TBD
-
-## TO PLAN:
-TBD
+1. Restructure and comment code so that it is easier to navigate and work with.
 
 ## DONE:
 TBD
