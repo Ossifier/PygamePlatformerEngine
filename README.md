@@ -6,10 +6,6 @@ This code has been significantly restructured due to troublesome bugs that arose
 
 This project now used an engine design more similar to DaFluffyPotato's engine, mainly for performance reasons. However, over time, significant changes to the engine are planned.
 
-
-## TO DO (Interpolation):
-1. Start Planning Tasks.
-
 ## TO DO (General):
 TBD
 
