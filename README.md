@@ -4,7 +4,7 @@ A simple 2D platformer engine written in Python/Pygame. Contains some simple sou
 ## IMPORTANT DEVELOPMENT NOTICE:
 This code has been significantly restructured due to troublesome bugs that arose from the prior engine. If for some reason you need this old code, it can be retrieved as one of the branches for this project. Both the interp and non-interp versions are preserved.
 
-This project now used an engine design more similar to DaFluffyPotato's engine, mainly for performance reasons. However, over time, significant changes to the engine are planned.
+This project now uses an engine design more similar to DaFluffyPotato's implementation, mainly for performance reasons. However, over time, significant changes to the engine are planned.
 
 ## TO DO (General):
 TBD
